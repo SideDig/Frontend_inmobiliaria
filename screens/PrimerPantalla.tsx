@@ -33,7 +33,7 @@ export default function PrimerPantalla() {
             source={require("../assets/logo_etacarinae.png")}
           />
           <Button
-              onPress={() => navigation.navigate("Registro")}
+              onPress={() => navigation.navigate("Registro" as never)}
             title="Regístrate"
             buttonStyle={styles.button}
             titleStyle={styles.buttonTitle}

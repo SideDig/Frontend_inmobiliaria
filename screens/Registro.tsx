@@ -6,11 +6,42 @@ import {
   SafeAreaView,
   StatusBar,
   TextInput,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
+import React, { useState } from "react";
 import { Button } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
+import { registrarUsuario } from "../context/AuthContext";
 
-export default function Registro() {
+const Registro: React.FC = () => {
+  const [nombre, setNombre] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [contrasena, setContrasena] = useState<string>("");
+  const [confirmarContrasena, setConfirmarContrasena] = useState<string>("");
+
+  const handleRegistro = async () => {
+    if (contrasena !== confirmarContrasena) {
+      Alert.alert("Error", "Las contraseñas no coinciden");
+      return;
+    }
+
+    try {
+      const userData = await registrarUsuario({ nombre, email, contrasena });
+      Alert.alert(
+        `Registro Exitoso ${userData.nombre}`,
+        "Usuario registrado correctamente."
+      );
+    } catch (error: any) {
+      Alert.alert(
+        "Error",
+        error.message || "Ocurrió un error durante el registro."
+      );
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar
@@ -32,23 +63,56 @@ export default function Registro() {
         </View>
       </LinearGradient>
 
-      <View style={styles.inputsContainer}>
-        <Text style={styles.titulo_form}>Registro</Text>
-        <Text style={styles.subtitulo}>Bienvenido crea una cuenta para continuar</Text>
-        <TextInput style={styles.input} placeholder="Nombre" />
-        <TextInput style={styles.input} placeholder="Correo electronico" />
-        <TextInput style={styles.input} placeholder="Contraseña" />
-        <TextInput style={styles.input} placeholder="Confirmar contraseña" />
-        <Button
-            title="Regístrate"
-            buttonStyle={styles.button}
-            titleStyle={styles.buttonTitle}
-            containerStyle={styles.buttonContainer}
-          />
-      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidingView}
+      >
+        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+          <View style={styles.inputsContainer}>
+            <Text style={styles.titulo_form}>Registro</Text>
+            <Text style={styles.subtitulo}>
+              Bienvenido crea una cuenta para continuar
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nombre"
+              value={nombre}
+              onChangeText={setNombre}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Correo electrónico"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Contraseña"
+              value={contrasena}
+              onChangeText={setContrasena}
+              secureTextEntry
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Confirmar contraseña"
+              value={confirmarContrasena}
+              onChangeText={setConfirmarContrasena}
+              secureTextEntry
+            />
+            <Button
+              title="Regístrate"
+              buttonStyle={styles.button}
+              titleStyle={styles.buttonTitle}
+              containerStyle={styles.buttonContainer}
+              onPress={handleRegistro}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -87,10 +151,10 @@ const styles = StyleSheet.create({
     fontSize: 25,
     marginVertical: 10,
   },
-  subtitulo:{
-    fontSize:13,
-    opacity:0.5,
-    marginVertical:5
+  subtitulo: {
+    fontSize: 13,
+    opacity: 0.5,
+    marginVertical: 5,
   },
   button: {
     width: 250,
@@ -105,8 +169,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   buttonContainer: {
-    marginVertical:20,
+    marginVertical: 20,
     height: 100,
     width: 250,
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollViewContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
+
+export default Registro;
