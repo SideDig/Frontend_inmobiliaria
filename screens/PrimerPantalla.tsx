@@ -40,7 +40,7 @@ export default function PrimerPantalla() {
             containerStyle={styles.buttonContainer}
           />
           <Button
-             
+             onPress={() => navigation.navigate("Login" as never)}
             title="Inicia sesión"
             buttonStyle={styles.button}
             titleStyle={styles.buttonTitle}
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     width: 500,
     height: 300,
     resizeMode: "contain",
-    marginBottom: 120,
+    marginBottom: 130 ,
   },
   button: {
     width: 250,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   buttonContainer: {
-    height: 100,
+    height: 80,
     width: 250,
     borderRadius: 20,
   },

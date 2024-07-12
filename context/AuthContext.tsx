@@ -6,10 +6,10 @@ interface RegistroData {
   contrasena: string;
 }
 
-// interface LoginData {
-//   email: string;
-//   contrasena: string;
-// }
+interface LoginData {
+   email: string;
+  contrasena: string;
+ }
 
 interface UserData {
   id: number;
@@ -27,11 +27,11 @@ export const registrarUsuario = async (data: RegistroData): Promise<UserData> =>
   }
 };
 
-// export const iniciarSesion = async (data: LoginData): Promise<UserData> => {
-//   try {
-//     const response = await api.post('/login', data);
-//     return response.data as UserData;
-//   } catch (error: any) {
-//     throw new Error(error.response.data.message);
-//   }
-// };
+ export const iniciarSesion = async (data: LoginData): Promise<UserData> => {
+   try {
+     const response = await api.post('/login', data);
+     return response.data as UserData;
+   } catch (error: any) {
+     throw new Error(error.response.data.message);
+   }
+ };
