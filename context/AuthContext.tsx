@@ -1,3 +1,4 @@
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 import api from '../conexionApi/axios';
 
 interface RegistroData {
@@ -7,31 +8,58 @@ interface RegistroData {
 }
 
 interface LoginData {
-   email: string;
+  email: string;
   contrasena: string;
- }
+}
 
 interface UserData {
   id: number;
   nombre: string;
   email: string;
-  //Recuerdaaa agregar los datooos completoos del usuarioooo porfavor
+  // Agrega más campos según sea necesario
 }
 
-export const registrarUsuario = async (data: RegistroData): Promise<UserData> => {
-  try {
-    const response = await api.post('/register', data);
-    return response.data as UserData;
-  } catch (error: any) {
-    throw new Error(error.response.data.message);
-  }
+interface AuthContextData {
+  user: UserData | null;
+  registrarUsuario: (data: RegistroData) => Promise<void>;
+  iniciarSesion: (data: LoginData) => Promise<void>;
+  cerrarSesion: () => void;
+}
+
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<UserData | null>(null);
+
+  const registrarUsuario = async (data: RegistroData): Promise<void> => {
+    try {
+      const response = await api.post('/register', data);
+      setUser(response.data as UserData);
+    } catch (error: any) {
+      throw new Error(error.response.data.message);
+    }
+  };
+
+  const iniciarSesion = async (data: LoginData): Promise<void> => {
+    try {
+      const response = await api.post('/login', data);
+      setUser(response.data as UserData);
+    } catch (error: any) {
+      throw new Error(error.response.data.message);
+    }
+  };
+
+  const cerrarSesion = () => {
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, registrarUsuario, iniciarSesion, cerrarSesion }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
- export const iniciarSesion = async (data: LoginData): Promise<UserData> => {
-   try {
-     const response = await api.post('/login', data);
-     return response.data as UserData;
-   } catch (error: any) {
-     throw new Error(error.response.data.message);
-   }
- };
+export const useAuth = (): AuthContextData => {
+  return useContext(AuthContext);
+};

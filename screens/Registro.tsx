@@ -1,3 +1,6 @@
+// Registro.tsx
+
+import React, { useState } from 'react';
 import {
   Text,
   StyleSheet,
@@ -6,39 +9,36 @@ import {
   SafeAreaView,
   StatusBar,
   TextInput,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-} from "react-native";
-import React, { useState } from "react";
-import { Button } from "@rneui/themed";
-import { LinearGradient } from "expo-linear-gradient";
-import { registrarUsuario } from "../context/AuthContext";
+  Alert,
+} from 'react-native';
+import { Button } from '@rneui/themed';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../context/AuthContext';
 
 const Registro: React.FC = () => {
-  const [nombre, setNombre] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [contrasena, setContrasena] = useState<string>("");
-  const [confirmarContrasena, setConfirmarContrasena] = useState<string>("");
+  const [nombre, setNombre] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [contrasena, setContrasena] = useState<string>('');
+  const [confirmarContrasena, setConfirmarContrasena] = useState<string>('');
+
+  const { registrarUsuario } = useAuth();
+  const navigation = useNavigation();
 
   const handleRegistro = async () => {
     if (contrasena !== confirmarContrasena) {
-      Alert.alert("Error", "Las contraseñas no coinciden");
+      Alert.alert('Error', 'Las contraseñas no coinciden');
       return;
     }
 
     try {
-      const userData = await registrarUsuario({ nombre, email, contrasena });
-      Alert.alert(
-        `Registro Exitoso ${userData.nombre}`,
-        "Usuario registrado correctamente."
-      );
+      await registrarUsuario({ nombre, email, contrasena });
+      navigation.navigate('FormDatosPersonales' as never); 
     } catch (error: any) {
-      Alert.alert(
-        "Error",
-        error.message || "Ocurrió un error durante el registro."
-      );
+      Alert.alert('Error', error.message || 'Ocurrió un error durante el registro.');
     }
   };
 
@@ -50,7 +50,7 @@ const Registro: React.FC = () => {
         backgroundColor="rgba(7,11,31,1)"
       />
       <LinearGradient
-        colors={["rgba(7,11,31,1)", "rgba(21,51,210,1)"]}
+        colors={['rgba(7,11,31,1)', 'rgba(21,51,210,1)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.container}
@@ -58,13 +58,13 @@ const Registro: React.FC = () => {
         <View style={styles.logoContainer}>
           <Image
             style={styles.logo}
-            source={require("../assets/logo_etacarinae.png")}
+            source={require('../assets/logo_etacarinae.png')}
           />
         </View>
       </LinearGradient>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
       >
         <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -117,21 +117,21 @@ const Registro: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: 'white',
   },
   container: {
     height: 300,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   logoContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   logo: {
     width: 500,
     height: 300,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     marginBottom: 40,
   },
   input: {
@@ -143,11 +143,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   inputsContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   titulo_form: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 25,
     marginVertical: 10,
   },
@@ -159,13 +159,13 @@ const styles = StyleSheet.create({
   button: {
     width: 250,
     height: 50,
-    backgroundColor: "#001061",
+    backgroundColor: '#001061',
     borderRadius: 10,
   },
   buttonTitle: {
-    fontWeight: "500",
+    fontWeight: '500',
     fontSize: 17,
-    color: "white",
+    color: 'white',
     borderRadius: 20,
   },
   buttonContainer: {
@@ -178,8 +178,8 @@ const styles = StyleSheet.create({
   },
   scrollViewContainer: {
     flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
