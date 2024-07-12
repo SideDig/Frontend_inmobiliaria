@@ -14,13 +14,17 @@ import {
   import React, { useState } from "react";
   import { Button } from "@rneui/themed";
   import { LinearGradient } from "expo-linear-gradient";
-  import {iniciarSesion} from "../context/AuthContext"
+  import { useAuth } from '../context/AuthContext';
+  import { useNavigation } from '@react-navigation/native';
+
 
   const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [contrasena, setContrasena] = useState<string>("");
   const [confirmarContrasena, setConfirmarContrasena] = useState<string>("");
-  
+
+  const { iniciarSesion } = useAuth();
+  const navigation = useNavigation();
 
   const handlelogin = async () => {
     if (contrasena !== confirmarContrasena) {
@@ -29,11 +33,8 @@ import {
     }
 
     try {
-      const userData = await iniciarSesion({ email, contrasena });
-      Alert.alert(
-        `Registro Exitoso ${userData.nombre}`,
-        "Usuario inicio sesion"
-      );
+      await iniciarSesion({ email, contrasena });
+      navigation.navigate('FormDatosPersonales' as never); 
     } catch (error: any) {
       Alert.alert(
         "Error",

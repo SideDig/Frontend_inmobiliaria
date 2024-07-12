@@ -23,7 +23,7 @@ interface AuthContextData {
   user: UserData | null;
   registrarUsuario: (data: RegistroData) => Promise<void>;
   iniciarSesion: (data: LoginData) => Promise<void>;
-  cerrarSesion: () => void;
+  
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -49,12 +49,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const cerrarSesion = () => {
-    setUser(null);
-  };
-
   return (
-    <AuthContext.Provider value={{ user, registrarUsuario, iniciarSesion, cerrarSesion }}>
+    <AuthContext.Provider value={{ user, registrarUsuario, iniciarSesion}}>
       {children}
     </AuthContext.Provider>
   );
