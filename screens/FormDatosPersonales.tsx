@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   Text,
   StyleSheet,
@@ -10,11 +11,103 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import React from "react";
 import { Button } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
+import axios from 'axios';
+import api from '../conexionApi/axios'; // Importar la instancia de axios configurada
+import { ExternalLink } from "../components/ExternalLink";
+import { Picker } from '@react-native-picker/picker';
+import { useAuth } from '../context/AuthContext'; // Importar useAuth para obtener el contexto de autenticación
+
+const API_KEY = "1eeac87a65c1b2c4f781fbe820023e1df1d2c8ad";
+const API_URL = "https://api.tau.com.mx/dipomex/v1/";
 
 const FormDatosPersonales: React.FC = () => {
+  const { user, token } = useAuth(); // Obtener el usuario y token del contexto de autenticación
+
+  const [states, setStates] = useState<{ ESTADO_ID: string; ESTADO: string }[]>([]);
+  const [cities, setCities] = useState<{ MUNICIPIO_ID: string; MUNICIPIO: string }[]>([]);
+
+  const [selectedState, setSelectedState] = useState<string>("");
+  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [nombreCompleto, setNombreCompleto] = useState<string>("");
+  const [telefono, setTelefono] = useState<string>("");
+  const [curp, setCurp] = useState<string>("");
+  const [direccion, setDireccion] = useState<string>("");
+
+  useEffect(() => {
+    fetchStates();
+  }, []);
+
+  useEffect(() => {
+    if (selectedState) {
+      fetchCities(selectedState);
+    }
+  }, [selectedState]);
+
+  const fetchStates = async () => {
+    try {
+      const response = await axios.get(`${API_URL}estados`, {
+        headers: {
+          "APIKEY": API_KEY,
+        },
+      });
+      setStates(response.data.estados);
+    } catch (error) {
+      console.error("Error fetching states:", error);
+    }
+  };
+
+  const fetchCities = async (stateId: string) => {
+    try {
+      const response = await axios.get(`${API_URL}municipios`, {
+        headers: {
+          "APIKEY": API_KEY,
+        },
+        params: {
+          id_estado: stateId,
+        },
+      });
+      setCities(response.data.municipios);
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    }
+  };
+
+  const handleFormSubmit = async () => {
+    if (!token) {
+      console.error("Token no disponible");
+      return;
+    }
+  
+    try {
+      const stateName = states.find(state => state.ESTADO_ID === selectedState)?.ESTADO || "";
+      const cityName = cities.find(city => city.MUNICIPIO_ID === selectedCity)?.MUNICIPIO || "";
+  
+      const response = await api.post(
+        "/usuarios/completarDatosPersonales",
+        {
+          nombre_completo: nombreCompleto,
+          telefono,
+          curp,
+          estado: stateName,
+          ciudad: cityName,
+          direccion,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      console.log("Datos adicionales actualizados correctamente:", response.data);
+    } catch (error: any) {
+      console.error("Error al completar datos adicionales:", error.response?.data || error.message);
+    }
+  };
+  
+  
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar
@@ -50,6 +143,8 @@ const FormDatosPersonales: React.FC = () => {
                 style={styles.input}
                 placeholder="Nombre completo"
                 keyboardType="default"
+                value={nombreCompleto}
+                onChangeText={setNombreCompleto}
               />
             </View>
 
@@ -60,6 +155,8 @@ const FormDatosPersonales: React.FC = () => {
                 placeholder="Numero de telefono"
                 maxLength={10}
                 keyboardType="numeric"
+                value={telefono}
+                onChangeText={setTelefono}
               />
             </View>
 
@@ -70,56 +167,78 @@ const FormDatosPersonales: React.FC = () => {
                 placeholder="Ingresa tu CURP"
                 keyboardType="default"
                 maxLength={18}
+                value={curp}
+                onChangeText={setCurp}
               />
             </View>
 
-            <Text style={styles.titulo_form}>Datos personales</Text>
+            <Text style={styles.titulo_form}>Datos de dirección</Text>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Estado</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingresa tu estado"
-                keyboardType="default"
-                maxLength={18}
-              />
+              <Picker
+                selectedValue={selectedState}
+                style={styles.picker}
+                onValueChange={(itemValue: string) => setSelectedState(itemValue)}
+              >
+                <Picker.Item label="Selecciona un estado" value="" />
+                {states.map((state) => (
+                  <Picker.Item
+                    key={state.ESTADO_ID}
+                    label={state.ESTADO}
+                    value={state.ESTADO_ID}
+                  />
+                ))}
+              </Picker>
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Ciudad</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingresa tu ciudad"
-                keyboardType="default"
-                maxLength={18}
-              />
+              <Text style={styles.label}>Municipio</Text>
+              <Picker
+                selectedValue={selectedCity}
+                style={styles.picker}
+                onValueChange={(itemValue: string) => setSelectedCity(itemValue)}
+              >
+                <Picker.Item label="Selecciona una ciudad" value="" />
+                {cities.map((city) => (
+                  <Picker.Item
+                    key={city.MUNICIPIO_ID}
+                    label={city.MUNICIPIO}
+                    value={city.MUNICIPIO_ID}
+                  />
+                ))}
+              </Picker>
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Direccion</Text>
+              <Text style={styles.label}>Dirección</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Ingresa tu direccion"
+                placeholder="Ingresa tu dirección"
                 keyboardType="default"
-                maxLength={18}
+                value={direccion}
+                onChangeText={setDireccion}
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Codigo postal</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingresa tu codigo postal"
-                keyboardType="default"
-                maxLength={18}
-              />
+            <View style={styles.terminos_cond}>
+              <Text style={{ textAlign: "center" }}>
+                Al hacer clic en Ingresar, acepta nuestros{" "}
+                <ExternalLink
+                  style={{ fontWeight: 900 }}
+                  href="https://tecnosoluciones.com/politicas-terminos-y-condiciones-de-uso-de-un-servicio-digital/"
+                >
+                  Términos de servicio y Política de privacidad
+                </ExternalLink>
+              </Text>
             </View>
-            <Text>Al hacer clic en Ingresar, acepta nuestros Términos de servicio y Política de privacidad</Text>
+
             <Button
-              title="Login"
+              title="Ingresar"
               buttonStyle={styles.button}
               titleStyle={styles.buttonTitle}
               containerStyle={styles.buttonContainer}
+              onPress={handleFormSubmit}
             />
           </View>
         </ScrollView>
@@ -157,13 +276,21 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginBottom: 5,
     fontSize: 16,
-    fontWeight:"bold"
+    fontWeight: "bold",
   },
   input: {
     height: 45,
     borderWidth: 1,
-    padding: 10,
+    borderColor: "#ddd",
     borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  picker: {
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    backgroundColor: 'white',
   },
   inputsContainer: {
     justifyContent: "center",
@@ -172,34 +299,35 @@ const styles = StyleSheet.create({
   },
   titulo_form: {
     fontWeight: "bold",
-    fontSize: 25,
-    marginVertical: 20,
-    textAlign: 'center',
-  },
-  button: {
-    width: 250,
-    height: 50,
-    backgroundColor: "#001061",
-    borderRadius: 10,
-  },
-  buttonTitle: {
-    fontWeight: "500",
-    fontSize: 17,
-    color: "white",
-    borderRadius: 20,
-  },
-  buttonContainer: {
-    marginVertical: 20,
-    height: 100,
-    width: 250,
-  },
-  keyboardAvoidingView: {
-    flex: 1,
+    fontSize: 19,
+    marginVertical: 15,
   },
   scrollViewContainer: {
     flexGrow: 1,
     justifyContent: "center",
+  },
+  button: {
+    backgroundColor: "rgba(7,11,31,1)",
+    borderRadius: 5,
+    height: 50,
+    justifyContent: "center",
     alignItems: "center",
+  },
+  buttonTitle: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  buttonContainer: {
+    width: "80%",
+    marginVertical: 20,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  terminos_cond: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
   },
 });
 
