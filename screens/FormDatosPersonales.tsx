@@ -14,10 +14,11 @@ import {
 import { Button } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from 'axios';
-import api from '../conexionApi/axios'; // Importar la instancia de axios configurada
+import api from '../conexionApi/axios'; 
 import { ExternalLink } from "../components/ExternalLink";
 import { Picker } from '@react-native-picker/picker';
-import { useAuth } from '../context/AuthContext'; // Importar useAuth para obtener el contexto de autenticación
+import { useAuth } from '../context/AuthContext'; 
+import { useNavigation } from '@react-navigation/native';
 
 const API_KEY = "1eeac87a65c1b2c4f781fbe820023e1df1d2c8ad";
 const API_URL = "https://api.tau.com.mx/dipomex/v1/";
@@ -34,7 +35,7 @@ const FormDatosPersonales: React.FC = () => {
   const [telefono, setTelefono] = useState<string>("");
   const [curp, setCurp] = useState<string>("");
   const [direccion, setDireccion] = useState<string>("");
-
+  const navigation = useNavigation();
   useEffect(() => {
     fetchStates();
   }, []);
@@ -102,6 +103,7 @@ const FormDatosPersonales: React.FC = () => {
       );
   
       console.log("Datos adicionales actualizados correctamente:", response.data);
+      navigation.navigate('PreferenciasUsuario' as never); 
     } catch (error: any) {
       console.error("Error al completar datos adicionales:", error.response?.data || error.message);
     }
@@ -299,8 +301,8 @@ const styles = StyleSheet.create({
   },
   titulo_form: {
     fontWeight: "bold",
-    fontSize: 19,
-    marginVertical: 15,
+    fontSize: 20,
+    marginVertical: 20,
   },
   scrollViewContainer: {
     flexGrow: 1,
