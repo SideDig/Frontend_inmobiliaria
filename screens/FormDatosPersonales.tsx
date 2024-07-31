@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// FormDatosPersonales.tsx
+import React, { useState } from "react";
 import {
   Text,
   StyleSheet,
@@ -11,69 +12,25 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
+import { ExternalLink } from "../components/ExternalLink";
+import api from '../conexionApi/axios'; 
 import { Button } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
-import axios from 'axios';
-import api from '../conexionApi/axios'; 
-import { ExternalLink } from "../components/ExternalLink";
 import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../context/AuthContext'; 
 import { useNavigation } from '@react-navigation/native';
-
-const API_KEY = "1eeac87a65c1b2c4f781fbe820023e1df1d2c8ad";
-const API_URL = "https://api.tau.com.mx/dipomex/v1/";
+import { useLocation } from '../context/UbicacionContext'; 
 
 const FormDatosPersonales: React.FC = () => {
-  const { user, token } = useAuth(); // Obtener el usuario y token del contexto de autenticación
+  const { user, token } = useAuth(); 
+  const { states, cities, selectedState, setSelectedState, fetchCities } = useLocation();
 
-  const [states, setStates] = useState<{ ESTADO_ID: string; ESTADO: string }[]>([]);
-  const [cities, setCities] = useState<{ MUNICIPIO_ID: string; MUNICIPIO: string }[]>([]);
-
-  const [selectedState, setSelectedState] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [nombreCompleto, setNombreCompleto] = useState<string>("");
   const [telefono, setTelefono] = useState<string>("");
   const [curp, setCurp] = useState<string>("");
   const [direccion, setDireccion] = useState<string>("");
   const navigation = useNavigation();
-  useEffect(() => {
-    fetchStates();
-  }, []);
-
-  useEffect(() => {
-    if (selectedState) {
-      fetchCities(selectedState);
-    }
-  }, [selectedState]);
-
-  const fetchStates = async () => {
-    try {
-      const response = await axios.get(`${API_URL}estados`, {
-        headers: {
-          "APIKEY": API_KEY,
-        },
-      });
-      setStates(response.data.estados);
-    } catch (error) {
-      console.error("Error fetching states:", error);
-    }
-  };
-
-  const fetchCities = async (stateId: string) => {
-    try {
-      const response = await axios.get(`${API_URL}municipios`, {
-        headers: {
-          "APIKEY": API_KEY,
-        },
-        params: {
-          id_estado: stateId,
-        },
-      });
-      setCities(response.data.municipios);
-    } catch (error) {
-      console.error("Error fetching cities:", error);
-    }
-  };
 
   const handleFormSubmit = async () => {
     if (!token) {
@@ -108,7 +65,6 @@ const FormDatosPersonales: React.FC = () => {
       console.error("Error al completar datos adicionales:", error.response?.data || error.message);
     }
   };
-  
   
   return (
     <SafeAreaView style={styles.safeArea}>

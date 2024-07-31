@@ -34,7 +34,7 @@ import {
 
     try {
       await iniciarSesion({ email, contrasena });
-      navigation.navigate('FormDatosPersonales' as never); 
+      navigation.navigate('Inicio' as never); 
     } catch (error: any) {
       Alert.alert(
         "Error",
