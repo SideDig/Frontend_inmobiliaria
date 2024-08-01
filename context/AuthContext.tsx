@@ -1,3 +1,4 @@
+// AuthContext.tsx
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import api from '../conexionApi/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -43,7 +44,7 @@ interface AuthContextData {
   iniciarSesion: (data: LoginData) => Promise<void>;
   cerrarSesion: () => Promise<void>;
   cargarUsuario: () => Promise<void>;
-  updateUserPreferences: (preferences: Partial<UserData>) => Promise<void>; // Nueva función
+  updateUserPreferences: (preferences: Partial<UserData>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);

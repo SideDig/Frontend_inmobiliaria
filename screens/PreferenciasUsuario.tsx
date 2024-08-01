@@ -45,10 +45,10 @@ const PreferenciasUsuario: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      setAddress(user.ubicacion_casa);
-      setSelectedRooms(user.num_recamaras.toString());
-      setPrecioDesde(user.precio_desde.toString());
-      setPrecioHasta(user.precio_hasta.toString());
+      setAddress(user.ubicacion_casa || '');
+      setSelectedRooms((user.num_recamaras || '').toString());
+      setPrecioDesde((user.precio_desde || '').toString());
+      setPrecioHasta((user.precio_hasta || '').toString());
     }
   }, [user]);
 

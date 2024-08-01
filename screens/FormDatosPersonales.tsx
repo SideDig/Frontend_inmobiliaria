@@ -13,16 +13,16 @@ import {
   ScrollView,
 } from "react-native";
 import { ExternalLink } from "../components/ExternalLink";
-import api from '../conexionApi/axios'; 
+import api from '../conexionApi/axios';
 import { Button } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { Picker } from '@react-native-picker/picker';
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
-import { useLocation } from '../context/UbicacionContext'; 
+import { useLocation } from '../context/UbicacionContext';
 
 const FormDatosPersonales: React.FC = () => {
-  const { user, token } = useAuth(); 
+  const { user, token, updateUserPreferences } = useAuth();
   const { states, cities, selectedState, setSelectedState, fetchCities } = useLocation();
 
   const [selectedCity, setSelectedCity] = useState<string>("");
@@ -37,11 +37,11 @@ const FormDatosPersonales: React.FC = () => {
       console.error("Token no disponible");
       return;
     }
-  
+
     try {
       const stateName = states.find(state => state.ESTADO_ID === selectedState)?.ESTADO || "";
       const cityName = cities.find(city => city.MUNICIPIO_ID === selectedCity)?.MUNICIPIO || "";
-  
+
       const response = await api.post(
         "/usuarios/completarDatosPersonales",
         {
@@ -58,14 +58,25 @@ const FormDatosPersonales: React.FC = () => {
           },
         }
       );
-  
+
       console.log("Datos adicionales actualizados correctamente:", response.data);
-      navigation.navigate('PreferenciasUsuario' as never); 
+
+      // Actualizar los datos del usuario en el contexto de autenticación
+      await updateUserPreferences({
+        nombre_completo: nombreCompleto,
+        telefono,
+        curp,
+        estado: stateName,
+        ciudad: cityName,
+        direccion,
+      });
+
+      navigation.navigate('PreferenciasUsuario' as never);
     } catch (error: any) {
       console.error("Error al completar datos adicionales:", error.response?.data || error.message);
     }
   };
-  
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar

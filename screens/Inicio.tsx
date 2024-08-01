@@ -1,3 +1,4 @@
+// Inicio.tsx
 import React, { useEffect } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';

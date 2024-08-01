@@ -8,6 +8,7 @@ import Login from './screens/Login';
 import Registro from './screens/Registro';
 import FormDatosPersonales from './screens/FormDatosPersonales';
 import PreferenciasUsuario from './screens/PreferenciasUsuario';
+import PerfilUsuario from './screens/PerfilUsuario';
 import Inicio from './screens/Inicio';
 import { AuthProvider } from './context/AuthContext';
 import { UbicacionProvider } from './context/UbicacionContext';
@@ -27,7 +28,9 @@ const Tabs = () => {
           if (route.name === 'HomeTab') {
             iconName = 'home-outline';
           } else if (route.name === 'PreferenciasUsuarioTab') {
-            iconName = 'settings-outline';
+            iconName = 'filter';
+          } else if (route.name === 'PerfilUsuarioTab') {
+            iconName = 'person-outline';
           }
           return <Icon name={iconName} size={size} color={color} />;
         },
@@ -50,6 +53,7 @@ const Tabs = () => {
     >
       <Tab.Screen name="HomeTab" component={Inicio} options={{ tabBarLabel: 'Inicio' }} />
       <Tab.Screen name="PreferenciasUsuarioTab" component={PreferenciasUsuario} options={{ tabBarLabel: 'Preferencias' }} />
+      <Tab.Screen name="PerfilUsuarioTab" component={PerfilUsuario} options={{ tabBarLabel: 'Perfil' }} />
     </Tab.Navigator>
   );
 };
@@ -66,8 +70,8 @@ const App = () => {
                 <Stack.Screen name="Home" component={PrimerPantalla} options={{ headerShown: false }} />
                 <Stack.Screen name="Registro" component={Registro} options={{ headerShown: false }} />
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-                <Stack.Screen name="FormDatosPersonales" component={FormDatosPersonales} options={{ headerShown: false }} />
-                <Stack.Screen name="PreferenciasUsuario" component={PreferenciasUsuario} options={{ headerShown: false }} />
+                 <Stack.Screen name="FormDatosPersonales" component={FormDatosPersonales} options={{ headerShown: false }} />
+                <Stack.Screen name="PreferenciasUsuario" component={PreferenciasUsuario} options={{ headerShown: false }} />  
                 <Stack.Screen name="Inicio" component={Tabs} options={{ headerShown: false }} />
               </Stack.Navigator>
             </NavigationContainer>
