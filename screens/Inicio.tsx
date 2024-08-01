@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Cards from '../components/Cards';
@@ -6,8 +6,14 @@ import { useDataContext } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 
 const Inicio: React.FC = () => {
-  const { propiedades } = useDataContext();
+  const { propiedades, fetchPropiedades } = useDataContext();
   const { user, isNewUser } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchPropiedades(user.precio_desde, user.precio_hasta, user.num_recamaras);
+    }
+  }, [user]);
 
   return (
     <SafeAreaView style={styles.safeArea}>

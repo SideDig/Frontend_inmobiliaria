@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../conexionApi/axios'; // Asegúrate de que la ruta sea correcta
+import api from '../conexionApi/axios';
 import { useAuth } from '../context/AuthContext';
-import { PreferenciasuseContext } from '../context/MapaContext';
 import { Alert } from 'react-native';
 
 export interface Propiedad {
@@ -27,14 +26,18 @@ interface DataContextProps {
 const DataContext = createContext<DataContextProps | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { token } = useAuth();
-  const { address } = PreferenciasuseContext();
+  const { token, user } = useAuth();
   const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
 
   const fetchPropiedades = async (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => {
     try {
       const response = await api.get('/propiedades/ubicacion', {
-        params: { ubicacion: address, precioDesde, precioHasta, numRecamaras },
+        params: { 
+          ubicacion: user?.ubicacion_casa, 
+          precioDesde: precioDesde || user?.precio_desde, 
+          precioHasta: precioHasta || user?.precio_hasta, 
+          numRecamaras: numRecamaras || user?.num_recamaras 
+        },
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -47,10 +50,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    if (address) {
+    if (user && token) {
       fetchPropiedades();
     }
-  }, [address, token]);
+  }, [user, token]);
 
   return (
     <DataContext.Provider value={{ propiedades, fetchPropiedades }}>

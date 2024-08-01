@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   StyleSheet,
@@ -22,10 +22,10 @@ import { ALERT_TYPE, Dialog, AlertNotificationRoot } from 'react-native-alert-no
 import { useAuth } from '../context/AuthContext';
 import { PreferenciasuseContext } from '../context/MapaContext';
 import { useNavigation } from '@react-navigation/native';
-import { useDataContext } from '../context/DataContext'; // Importar el contexto de datos
+import { useDataContext } from '../context/DataContext';
 
 const PreferenciasUsuario: React.FC = () => {
-  const { token } = useAuth();
+  const { token, user, updateUserPreferences } = useAuth();
   const {
     location,
     setLocation,
@@ -41,7 +41,16 @@ const PreferenciasUsuario: React.FC = () => {
   const navigation = useNavigation();
   const [precioDesde, setPrecioDesde] = useState('');
   const [precioHasta, setPrecioHasta] = useState('');
-  const { fetchPropiedades } = useDataContext(); // Obtener la función fetchPropiedades
+  const { fetchPropiedades } = useDataContext();
+
+  useEffect(() => {
+    if (user) {
+      setAddress(user.ubicacion_casa);
+      setSelectedRooms(user.num_recamaras.toString());
+      setPrecioDesde(user.precio_desde.toString());
+      setPrecioHasta(user.precio_hasta.toString());
+    }
+  }, [user]);
 
   const showAlertSuccess = (title: string, message: string) => {
     Dialog.show({
@@ -208,7 +217,13 @@ const PreferenciasUsuario: React.FC = () => {
 
       if (response.data.message) {
         showAlertSuccess('Éxito', response.data.message);
-        await fetchPropiedades(parseFloat(precioDesde), parseFloat(precioHasta), parseInt(selectedRooms)); // Llamar a fetchPropiedades con los filtros
+        await updateUserPreferences({
+          ubicacion_casa: address,
+          num_recamaras: parseInt(selectedRooms),
+          precio_desde: parseFloat(precioDesde),
+          precio_hasta: parseFloat(precioHasta),
+        });
+        await fetchPropiedades(parseFloat(precioDesde), parseFloat(precioHasta), parseInt(selectedRooms));
         navigation.navigate('Inicio' as never);
       }
     } catch (error) {

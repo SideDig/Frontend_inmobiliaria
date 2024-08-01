@@ -43,6 +43,7 @@ interface AuthContextData {
   iniciarSesion: (data: LoginData) => Promise<void>;
   cerrarSesion: () => Promise<void>;
   cargarUsuario: () => Promise<void>;
+  updateUserPreferences: (preferences: Partial<UserData>) => Promise<void>; // Nueva función
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -112,8 +113,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const updateUserPreferences = async (preferences: Partial<UserData>): Promise<void> => {
+    if (!user) return;
+
+    const updatedUser = { ...user, ...preferences };
+    setUser(updatedUser);
+    await AsyncStorage.setItem('userData', JSON.stringify(updatedUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, isNewUser, registrarUsuario, iniciarSesion, cerrarSesion, cargarUsuario }}>
+    <AuthContext.Provider value={{ user, token, isNewUser, registrarUsuario, iniciarSesion, cerrarSesion, cargarUsuario, updateUserPreferences }}>
       {children}
     </AuthContext.Provider>
   );
