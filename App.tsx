@@ -11,7 +11,7 @@ import PreferenciasUsuario from './screens/PreferenciasUsuario';
 import Inicio from './screens/Inicio';
 import { AuthProvider } from './context/AuthContext';
 import { UbicacionProvider } from './context/UbicacionContext';
-import { PreferenciasProvider } from './context/PreferenciasContext';
+import { PreferenciasProvider } from './context/MapaContext';
 import { DataProvider } from './context/DataContext';
 
 

@@ -12,17 +12,17 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import api from '../conexionApi/axios';
 import MapView, { Marker, MapPressEvent } from 'react-native-maps';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
-import api from '../conexionApi/axios'; 
 import { Button } from '@rneui/themed';
-import { useAuth } from '../context/AuthContext'; 
 import { Picker } from '@react-native-picker/picker';
 import { ALERT_TYPE, Dialog, AlertNotificationRoot } from 'react-native-alert-notification';
-import { PreferenciasuseContext } from '../context/PreferenciasContext';
+import { useAuth } from '../context/AuthContext';
+import { PreferenciasuseContext } from '../context/MapaContext';
 import { useNavigation } from '@react-navigation/native';
-
+import { useDataContext } from '../context/DataContext'; // Importar el contexto de datos
 
 const PreferenciasUsuario: React.FC = () => {
   const { token } = useAuth();
@@ -41,6 +41,7 @@ const PreferenciasUsuario: React.FC = () => {
   const navigation = useNavigation();
   const [precioDesde, setPrecioDesde] = useState('');
   const [precioHasta, setPrecioHasta] = useState('');
+  const { fetchPropiedades } = useDataContext(); // Obtener la función fetchPropiedades
 
   const showAlertSuccess = (title: string, message: string) => {
     Dialog.show({
@@ -152,7 +153,7 @@ const PreferenciasUsuario: React.FC = () => {
       showAlertWarning('Error', 'Por favor, ingresa una dirección válida.');
       return false;
     }
-  
+
     try {
       const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
         params: {
@@ -160,7 +161,7 @@ const PreferenciasUsuario: React.FC = () => {
           key: '02883607502f46e8ac4aef1f6e54bcb6',
         },
       });
-  
+
       const { results } = response.data;
       if (results.length === 0) {
         showAlertWarning('Error', 'La dirección ingresada no es válida.');
@@ -171,30 +172,28 @@ const PreferenciasUsuario: React.FC = () => {
       showAlertWarning('Error', 'No se pudo validar la dirección. Inténtalo de nuevo.');
       return false;
     }
-  
+
     if (!precioDesde.trim() || !precioHasta.trim()) {
       showAlertWarning('Error', 'Por favor, ingresa un rango de precios válido.');
       return false;
     }
-  
+
     const precioDesdeNum = parseFloat(precioDesde);
     const precioHastaNum = parseFloat(precioHasta);
-  
+
     if (precioDesdeNum > precioHastaNum) {
       showAlertWarning('Error', 'El precio "Hasta" debe ser mayor que el precio "Desde".');
       return false;
     }
-  
+
     return true;
   };
-  
-  
 
   const handleSubmit = async () => {
     if (!(await validateForm())) {
       return;
     }
-  
+
     try {
       const response = await api.post('/usuarios/completarPreferenciasUsuario', {
         ubicacion_casa: address,
@@ -206,18 +205,17 @@ const PreferenciasUsuario: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (response.data.message) {
         showAlertSuccess('Éxito', response.data.message);
-        navigation.navigate('Inicio' as never); 
+        await fetchPropiedades(parseFloat(precioDesde), parseFloat(precioHasta), parseInt(selectedRooms)); // Llamar a fetchPropiedades con los filtros
+        navigation.navigate('Inicio' as never);
       }
     } catch (error) {
       console.error('Error al completar las preferencias:', error);
       showAlertWarning('Error', 'Ocurrió un error al completar las preferencias.');
     }
   };
-  
-  
 
   return (
     <AlertNotificationRoot>

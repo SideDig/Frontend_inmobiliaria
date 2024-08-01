@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../conexionApi/axios'; // Asegúrate de que la ruta sea correcta
 import { useAuth } from '../context/AuthContext';
-import { PreferenciasuseContext } from '../context/PreferenciasContext';
+import { PreferenciasuseContext } from '../context/MapaContext';
 import { Alert } from 'react-native';
 
 export interface Propiedad {
@@ -21,7 +21,7 @@ export interface Propiedad {
 
 interface DataContextProps {
   propiedades: Propiedad[];
-  fetchPropiedades: () => void;
+  fetchPropiedades: (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => void;
 }
 
 const DataContext = createContext<DataContextProps | undefined>(undefined);
@@ -31,10 +31,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { address } = PreferenciasuseContext();
   const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
 
-  const fetchPropiedades = async () => {
+  const fetchPropiedades = async (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => {
     try {
       const response = await api.get('/propiedades/ubicacion', {
-        params: { ubicacion: address },
+        params: { ubicacion: address, precioDesde, precioHasta, numRecamaras },
         headers: {
           Authorization: `Bearer ${token}`,
         },

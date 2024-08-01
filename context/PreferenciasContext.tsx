@@ -1,68 +1,36 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+// context/PreferenciasContext.js
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-interface Coordinates {
-    latitude: number;
-    longitude: number;
+interface PreferenciasContextData {
+  address: string;
+  setAddress: (address: string) => void;
+  selectedRooms: string;
+  setSelectedRooms: (rooms: string) => void;
+  precioDesde: string;
+  setPrecioDesde: (precio: string) => void;
+  precioHasta: string;
+  setPrecioHasta: (precio: string) => void;
 }
 
-interface MapRegion {
-    latitude: number;
-    longitude: number;
-    latitudeDelta: number;
-    longitudeDelta: number;
-}
+const PreferenciasContext = createContext<PreferenciasContextData | undefined>(undefined);
 
-interface PreferenciasContextProps {
-    location: Coordinates | null;
-    setLocation: React.Dispatch<React.SetStateAction<Coordinates | null>>;
-    address: string;
-    setAddress: React.Dispatch<React.SetStateAction<string>>;
-    mapRegion: MapRegion;
-    setMapRegion: React.Dispatch<React.SetStateAction<MapRegion>>;
-    isMapVisible: boolean;
-    setIsMapVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    selectedRooms: string;
-    setSelectedRooms: React.Dispatch<React.SetStateAction<string>>;
-}
+export const PreferenciasProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [address, setAddress] = useState<string>('');
+  const [selectedRooms, setSelectedRooms] = useState<string>('1');
+  const [precioDesde, setPrecioDesde] = useState<string>('');
+  const [precioHasta, setPrecioHasta] = useState<string>('');
 
-const PreferenciasContext = createContext<PreferenciasContextProps | undefined>(undefined);
-
-export const PreferenciasProvider = ({ children }: { children: ReactNode }) => {
-    const [location, setLocation] = useState<Coordinates | null>(null);
-    const [address, setAddress] = useState<string>('');
-    const [mapRegion, setMapRegion] = useState<MapRegion>({
-        latitude: 23.868667894047714,
-        longitude: -102.70353657966429,
-        latitudeDelta: 20.0922,
-        longitudeDelta: 0.0421
-    });
-    const [isMapVisible, setIsMapVisible] = useState<boolean>(false);
-    const [selectedRooms, setSelectedRooms] = useState<string>('1');
-
-    return (
-        <PreferenciasContext.Provider
-            value={{
-                location,
-                setLocation,
-                address,
-                setAddress,
-                mapRegion,
-                setMapRegion,
-                isMapVisible,
-                setIsMapVisible,
-                selectedRooms,
-                setSelectedRooms
-            }}
-        >
-            {children}
-        </PreferenciasContext.Provider>
-    );
+  return (
+    <PreferenciasContext.Provider value={{ address, setAddress, selectedRooms, setSelectedRooms, precioDesde, setPrecioDesde, precioHasta, setPrecioHasta }}>
+      {children}
+    </PreferenciasContext.Provider>
+  );
 };
 
-export const PreferenciasuseContext = () => {
-    const context = useContext(PreferenciasContext);
-    if (context === undefined) {
-        throw new Error('useDataContext must be used within a DataProvider');
-    }
-    return context;
+export const usePreferenciasContext = (): PreferenciasContextData => {
+  const context = useContext(PreferenciasContext);
+  if (!context) {
+    throw new Error('usePreferenciasContext must be used within a PreferenciasProvider');
+  }
+  return context;
 };
