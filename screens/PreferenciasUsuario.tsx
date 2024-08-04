@@ -254,6 +254,7 @@ const PreferenciasUsuario: React.FC = () => {
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>¿Dónde te gustaría la vivienda?</Text>
+                <Text style={styles.avisoubicacion}>Te recomiendo solo ingresar el Estado o municipio para mejores resultados</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Ingresa tu ubicación"
@@ -293,7 +294,7 @@ const PreferenciasUsuario: React.FC = () => {
                     <Picker.Item label="2 recámaras" value="2" />
                     <Picker.Item label="3 recámaras" value="3" />
                     <Picker.Item label="4 recámaras" value="4" />
-                    <Picker.Item label="5 recámaras" value="+5" />
+                    <Picker.Item label="+5 recámaras" value="5" />
                   </Picker>
                 </View>
               </View>
@@ -461,6 +462,10 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal:10,
   },
+  avisoubicacion:{
+    fontSize: 10,
+    fontWeight: '300',
+  }
 });
 
 export default PreferenciasUsuario;

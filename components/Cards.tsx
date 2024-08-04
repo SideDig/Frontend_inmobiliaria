@@ -1,7 +1,17 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { SimpleLineIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+
+export interface Agente {
+  id: number;
+  nombre: string;
+  email: string;
+  telefono: string;
+  total_ventas: number;
+  num_propiedades: number;
+}
 
 export interface Propiedad {
   id: number;
@@ -9,11 +19,11 @@ export interface Propiedad {
   direccion: string;
   descripcion: string;
   precio: number;
-  agente_id: number;
+  agente: Agente;
   habitaciones: number;
   baños: number;
   tamaño_terreno: number;
-  caracteristicas: string;
+  caracteristicas: string[];
   ubicacion: string;
   imagen?: string;
 }
@@ -23,12 +33,22 @@ interface CardsProps {
 }
 
 const Cards: React.FC<CardsProps> = ({ propiedad }) => {
+  const navigation = useNavigation<any>();  // Usar `any` para los parámetros de la navegación
+
+  const handlePress = () => {
+    console.log('Navigating to DetallesPropiedad with propiedadId:', propiedad.id);
+    navigation.navigate('DetallesPropiedad', { propiedadId: propiedad.id });
+  };
+
   return (
-    <View style={styles.propertyCard}>
+    <TouchableOpacity style={styles.propertyCard} onPress={handlePress}>
       <Image source={{ uri: propiedad.imagen || 'https://via.placeholder.com/150' }} style={styles.propertyImage} />
       <Text style={styles.propertyTitle}>{propiedad.nombre_propiedad}</Text>
       <Text style={styles.propertyPrice}>{`$${propiedad.precio}`}</Text>
-      <Text style={styles.propertyAddress}>{propiedad.direccion}</Text>
+      <View style={styles.ubicaciones}>
+        <Text style={styles.propertyAddress}>{propiedad.direccion}</Text>
+        <Text style={styles.propertyAddress}>, {propiedad.ubicacion}</Text>
+      </View>
       <View style={styles.propertyDetails}>
         <FontAwesome name="bed" size={20} color="black" style={{ margin: 5 }} />
         <Text>{propiedad.habitaciones}</Text>
@@ -37,7 +57,7 @@ const Cards: React.FC<CardsProps> = ({ propiedad }) => {
         <SimpleLineIcons name="size-fullscreen" size={20} color="black" style={{ margin: 5 }} />
         <Text>{`${propiedad.tamaño_terreno} m²`}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -75,8 +95,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 2,
     flexDirection: 'row',
+    gap: 5,
     justifyContent: 'flex-start',
   },
+  ubicaciones: {
+    flexDirection: 'row',
+  }
 });
 
 export default Cards;

@@ -10,11 +10,11 @@ import FormDatosPersonales from './screens/FormDatosPersonales';
 import PreferenciasUsuario from './screens/PreferenciasUsuario';
 import PerfilUsuario from './screens/PerfilUsuario';
 import Inicio from './screens/Inicio';
+import DetallesPropiedad from './screens/DetallesPropiedad'; // Importación de la nueva pantalla
 import { AuthProvider } from './context/AuthContext';
 import { UbicacionProvider } from './context/UbicacionContext';
 import { PreferenciasProvider } from './context/MapaContext';
 import { DataProvider } from './context/DataContext';
-
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -42,7 +42,6 @@ const Tabs = () => {
           elevation: 0,
           shadowOpacity: 0,
           height: 50,
-
         },
         tabBarLabelStyle: {
           fontSize: 13,
@@ -60,7 +59,6 @@ const Tabs = () => {
 
 const App = () => {
   return (
-
     <AuthProvider>
       <UbicacionProvider>
         <PreferenciasProvider>
@@ -70,16 +68,16 @@ const App = () => {
                 <Stack.Screen name="Home" component={PrimerPantalla} options={{ headerShown: false }} />
                 <Stack.Screen name="Registro" component={Registro} options={{ headerShown: false }} />
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-                 <Stack.Screen name="FormDatosPersonales" component={FormDatosPersonales} options={{ headerShown: false }} />
-                <Stack.Screen name="PreferenciasUsuario" component={PreferenciasUsuario} options={{ headerShown: false }} />  
+                <Stack.Screen name="FormDatosPersonales" component={FormDatosPersonales} options={{ headerShown: false }} />
+                <Stack.Screen name="PreferenciasUsuario" component={PreferenciasUsuario} options={{ headerShown: false }} />
                 <Stack.Screen name="Inicio" component={Tabs} options={{ headerShown: false }} />
+                <Stack.Screen name="DetallesPropiedad" component={DetallesPropiedad} options={{ headerShown: false }} />
               </Stack.Navigator>
             </NavigationContainer>
           </DataProvider>
         </PreferenciasProvider>
       </UbicacionProvider>
     </AuthProvider>
-
   );
 };
 

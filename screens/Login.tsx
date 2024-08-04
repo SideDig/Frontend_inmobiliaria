@@ -95,7 +95,7 @@ import {
                 secureTextEntry
               />
               <Button
-                title="Login"
+                title="Inicia sesion"
                 buttonStyle={styles.button}
                 titleStyle={styles.buttonTitle}
                 containerStyle={styles.buttonContainer}

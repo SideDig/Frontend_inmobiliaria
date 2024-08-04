@@ -3,11 +3,12 @@ import React, { useEffect } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Cards from '../components/Cards';
+import Cardsopciones from '../components/CardOpciones';
 import { useDataContext } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 
 const Inicio: React.FC = () => {
-  const { propiedades, fetchPropiedades } = useDataContext();
+  const { propiedades, otrasPropiedades, fetchPropiedades } = useDataContext();
   const { user, isNewUser } = useAuth();
 
   useEffect(() => {
@@ -42,7 +43,13 @@ const Inicio: React.FC = () => {
             <Cards key={index} propiedad={propiedad} />
           ))}
         </ScrollView>
+
         <Text style={styles.titulos_seciones}>Otras opciones</Text>
+        <ScrollView showsVerticalScrollIndicator={false} style={styles.otras_opciones}>
+          {otrasPropiedades.map((propiedad, index) => (
+            <Cardsopciones key={index} propiedad={propiedad} />
+          ))}
+        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
@@ -88,6 +95,9 @@ const styles = StyleSheet.create({
   },
   recomendaciones_parati: {
     flexDirection: 'row',
+  },
+  otras_opciones: {
+    flexDirection: 'column',
   },
 });
 
