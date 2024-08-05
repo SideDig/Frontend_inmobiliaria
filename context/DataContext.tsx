@@ -2,37 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../conexionApi/axios';
 import { useAuth } from '../context/AuthContext';
 import { Alert } from 'react-native';
-
-export interface Agente {
-  id: number;
-  nombre: string;
-  email: string;
-  telefono: string;
-  total_ventas: number;
-  num_propiedades: number;
-}
-
-export interface Propiedad {
-  id: number;
-  nombre_propiedad: string;
-  direccion: string;
-  descripcion: string;
-  precio: number;
-  agente: Agente;  // Cambia de agente_id a agente
-  habitaciones: number;
-  baños: number;
-  tamaño_terreno: number;
-  caracteristicas: string[];
-  ubicacion: string;
-  imagen?: string;
-}
-
-interface DataContextProps {
-  propiedades: Propiedad[];
-  otrasPropiedades: Propiedad[];
-  fetchPropiedades: (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => void;
-  fetchPropiedad: (propiedadId: number) => Promise<Propiedad | null>;
-}
+import { DataContextProps, Propiedad } from '../types';
 
 const DataContext = createContext<DataContextProps | undefined>(undefined);
 
@@ -73,10 +43,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await api.get(`/propiedades/${propiedadId}`);
       const data = response.data;
-  
+
       // Convierte caracteristicas de una cadena a un array
       const caracteristicasArray = data.caracteristicas.split(',').map((item: string) => item.trim());
-  
+
       return {
         ...data,
         caracteristicas: caracteristicasArray,
@@ -94,7 +64,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return null;
     }
   };
-  
 
   useEffect(() => {
     if (user && token) {

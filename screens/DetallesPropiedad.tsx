@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Linking } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { useDataContext, Propiedad } from '../context/DataContext';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { useDataContext } from '../context/DataContext';
+import { Propiedad } from '../types';
 import { FontAwesome } from '@expo/vector-icons';
 
+type DetallesPropiedadRouteProp = RouteProp<{ DetallesPropiedad: { propiedadId: number } }, 'DetallesPropiedad'>;
+type DetallesPropiedadNavigationProp = {
+    navigate: (screen: 'CrearPresupuesto', params: { propiedad: Propiedad }) => void;
+};
+
 const DetallesPropiedad = () => {
-    const route = useRoute<any>();
+    const route = useRoute<DetallesPropiedadRouteProp>();
     const propiedadId = route.params?.propiedadId;
     const { fetchPropiedad } = useDataContext();
+    const navigation = useNavigation<DetallesPropiedadNavigationProp>();
 
     const [propiedad, setPropiedad] = useState<Propiedad | null>(null);
 
@@ -30,7 +37,6 @@ const DetallesPropiedad = () => {
         );
     }
 
-    // Asegúrate de que caracteristicas es siempre un array
     const caracteristicas = Array.isArray(propiedad.caracteristicas) ? propiedad.caracteristicas : [];
 
     const handleEmailPress = () => {
@@ -86,7 +92,10 @@ const DetallesPropiedad = () => {
                 </View>
                 <Text style={styles.subTitle}>Ubicación</Text>
                 <Image source={{ uri: 'https://via.placeholder.com/300x200' }} style={styles.mapImage} />
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity 
+                    style={styles.button}
+                    onPress={() => navigation.navigate('CrearPresupuesto', { propiedad })}
+                >
                     <Text style={styles.buttonText}>Crear presupuesto</Text>
                 </TouchableOpacity>
             </View>
@@ -210,7 +219,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     button: {
-        backgroundColor: '#0000FF',
+        backgroundColor: '#001061',
         borderRadius: 10,
         paddingVertical: 15,
         alignItems: 'center',

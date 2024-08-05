@@ -36,7 +36,6 @@ const Cardsopciones: React.FC<CardsProps> = ({ propiedad }) => {
   const navigation = useNavigation<any>();  // Usar `any` para los parámetros de la navegación
 
   const handlePress = () => {
-    console.log('Navigating to DetallesPropiedad with propiedadId:', propiedad.id);
     navigation.navigate('DetallesPropiedad', { propiedadId: propiedad.id });
   };
 
