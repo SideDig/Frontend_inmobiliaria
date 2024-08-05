@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../conexionApi/axios';
 import { useAuth } from '../context/AuthContext';
 import { Alert } from 'react-native';
-import { DataContextProps, Propiedad } from '../types';
+import { DataContextProps, Propiedad, MaestroAlbanil } from '../types';
 
 const DataContext = createContext<DataContextProps | undefined>(undefined);
 
@@ -10,6 +10,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { token, user } = useAuth();
   const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
   const [otrasPropiedades, setOtrasPropiedades] = useState<Propiedad[]>([]);
+  const [maestrosAlbaniles, setMaestrosAlbaniles] = useState<MaestroAlbanil[]>([]);
 
   const fetchPropiedades = async (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => {
     try {
@@ -44,7 +45,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await api.get(`/propiedades/${propiedadId}`);
       const data = response.data;
 
-      // Convierte caracteristicas de una cadena a un array
       const caracteristicasArray = data.caracteristicas.split(',').map((item: string) => item.trim());
 
       return {
@@ -65,14 +65,25 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const fetchMaestrosAlbaniles = async () => {
+    try {
+      const response = await api.get('/albaniles');
+      setMaestrosAlbaniles(response.data);
+    } catch (error) {
+      console.error('Error al obtener maestros albañiles:', error);
+      Alert.alert('Error', 'No se pudieron obtener los maestros albañiles. Verifica tu conexión.');
+    }
+  };
+
   useEffect(() => {
     if (user && token) {
       fetchPropiedades();
+      fetchMaestrosAlbaniles();
     }
   }, [user, token]);
 
   return (
-    <DataContext.Provider value={{ propiedades, otrasPropiedades, fetchPropiedades, fetchPropiedad }}>
+    <DataContext.Provider value={{ propiedades, otrasPropiedades, fetchPropiedades, fetchPropiedad, maestrosAlbaniles }}>
       {children}
     </DataContext.Provider>
   );

@@ -13,7 +13,7 @@ export interface Propiedad {
   direccion: string;
   descripcion: string;
   precio: number;
-  agente: Agente; 
+  agente: Agente;
   habitaciones: number;
   baños: number;
   tamaño_terreno: number;
@@ -36,9 +36,25 @@ export interface Category {
   items: Item[];
 }
 
+export interface MaestroAlbanil {
+  id: number;
+  nombre: string;
+  telefono: string;
+  descripcion: string;
+  foto_url: string;
+  trabajos_realizados: number;
+  costo_mano_obra: number;
+}
+
+export interface MaestroAlbanilItem extends MaestroAlbanil {
+  costo_estimado: number;
+  tiempo_estimado: number;
+}
+
 export interface DataContextProps {
   propiedades: Propiedad[];
   otrasPropiedades: Propiedad[];
   fetchPropiedades: (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => void;
   fetchPropiedad: (propiedadId: number) => Promise<Propiedad | null>;
+  maestrosAlbaniles: MaestroAlbanil[];
 }

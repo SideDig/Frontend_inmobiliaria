@@ -70,12 +70,10 @@ const App = () => {
                 <Stack.Screen name="Registro" component={Registro} options={{ headerShown: false }} />
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
                 <Stack.Screen name="FormDatosPersonales" component={FormDatosPersonales} options={{ headerShown: false }} />
-                <Stack.Screen name="PreferenciasUsuario" component={PreferenciasUsuario} options={{ headerShown: false }} /> */}
+                <Stack.Screen name="PreferenciasUsuario" component={PreferenciasUsuario} options={{ headerShown: false }} />  */}
                 <Stack.Screen name="Inicio" component={Tabs} options={{ headerShown: false }} />
                 <Stack.Screen name="DetallesPropiedad" component={DetallesPropiedad} options={{ headerShown: false }} /> 
-                <Stack.Screen name="CrearPresupuesto" component={CrearPresupuesto} 
-                options={({ navigation }) => ({ headerTitle: "Crear presupuesto", headerLeft: () => ( <Icon.Button name="arrow-back" size={25} backgroundColor="#fff" color="#000" onPress={() => navigation.goBack()}/>  ),})}
-                />
+                <Stack.Screen name="CrearPresupuesto" component={CrearPresupuesto} options={({ navigation }) => ({ headerTitle: "Crear presupuesto", headerLeft: () => ( <Icon.Button name="arrow-back" size={25} backgroundColor="#fff" color="#000" onPress={() => navigation.goBack()}/>),})}/>
               </Stack.Navigator>
             </NavigationContainer>
           </DataProvider>
