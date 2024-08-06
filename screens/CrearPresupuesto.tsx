@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Image, StyleSheet, TextInput, SafeAreaView, Tou
 import api from '../conexionApi/axios';
 import { AxiosError } from 'axios';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { Propiedad, Category, MaestroAlbanilItem } from '../types';
+import { Propiedad, Category, MaestroAlbanilItem, Item } from '../types';
 
 type CrearPresupuestoRouteProp = RouteProp<{ CrearPresupuesto: { propiedad: Propiedad } }, 'CrearPresupuesto'>;
 
@@ -32,11 +32,13 @@ const CrearPresupuesto = () => {
     };
 
     const [selectedBuilders, setSelectedBuilders] = useState<{ [key: number]: string }>({});
+    const [selectedItems, setSelectedItems] = useState<Item[]>([]);
     const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
     const [categories, setCategories] = useState<Category[]>([]);
     const [maestrosPorItem, setMaestrosPorItem] = useState<{ [key: number]: MaestroAlbanilItem[] }>({});
     const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
     const [isModalVisible, setModalVisible] = useState<boolean>(false);
+    const [totalCost, setTotalCost] = useState<number>(parseFloat(propiedad.precio.toString()));
 
     useEffect(() => {
         api.get('/item/categories')
@@ -75,6 +77,16 @@ const CrearPresupuesto = () => {
                 }
             });
         }
+    };
+
+    const handleAddItem = (item: Item) => {
+        setSelectedItems(prev => [...prev, item]);
+        setTotalCost(prev => prev + parseFloat(item.costo));
+    };
+
+    const handleRemoveItem = (itemId: number, itemCost: string) => {
+        setSelectedItems(prev => prev.filter(item => item.id !== itemId));
+        setTotalCost(prev => prev - parseFloat(itemCost));
     };
 
     const openModal = (itemId: number) => {
@@ -124,14 +136,22 @@ const CrearPresupuesto = () => {
                                             <Text style={styles.itemText}>{item.nombre}</Text>
                                             <Text style={styles.itemDescription}>{item.descripcion}</Text>
                                             <Text style={styles.itemCost}>{item.costo !== undefined ? `$${parseFloat(item.costo).toFixed(2)}` : 'Precio no disponible'}</Text>
-                                            <TouchableOpacity style={styles.addButton} onPress={() => { /* Lógica para agregar ítem */ }}>
-                                                <Text style={styles.addButtonText}>Agregar</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity onPress={() => openModal(item.id)} style={styles.selectButton}>
-                                                <Text style={styles.selectButtonText}>
-                                                    {selectedBuilders[item.id] ? `Maestro seleccionado: ${selectedBuilders[item.id]}` : 'Seleccionar maestro'}
-                                                </Text>
-                                            </TouchableOpacity>
+                                            {selectedItems.some(selectedItem => selectedItem.id === item.id) ? (
+                                                <>
+                                                    <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveItem(item.id, item.costo)}>
+                                                        <Text style={styles.removeButtonText}>Remover</Text>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity onPress={() => openModal(item.id)} style={styles.selectButton}>
+                                                        <Text style={styles.selectButtonText}>
+                                                            {selectedBuilders[item.id] ? `Maestro seleccionado: ${selectedBuilders[item.id]}` : 'Seleccionar maestro'}
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                </>
+                                            ) : (
+                                                <TouchableOpacity style={styles.addButton} onPress={() => handleAddItem(item)}>
+                                                    <Text style={styles.addButtonText}>Agregar</Text>
+                                                </TouchableOpacity>
+                                            )}
                                         </View>
                                     </View>
                                 ))}
@@ -142,9 +162,17 @@ const CrearPresupuesto = () => {
                 <Text style={styles.label}>Presupuesto Total:</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Ingresa el presupuesto"
-                    keyboardType="numeric"
+                    value={`$${totalCost.toFixed(2)}`}
+                    editable={false}
                 />
+                <View style={styles.selectedItemsContainer}>
+                    <Text style={styles.selectedItemsTitle}>Ítems Seleccionados:</Text>
+                    {selectedItems.map((item) => (
+                        <View key={item.id} style={styles.selectedItem}>
+                            <Text style={styles.selectedItemText}>{item.nombre} - ${parseFloat(item.costo).toFixed(2)}</Text>
+                        </View>
+                    ))}
+                </View>
                 <TouchableOpacity style={styles.saveButton} onPress={() => { /* Lógica para guardar el presupuesto */ }}>
                     <Text style={styles.saveButtonText}>Guardar Presupuesto</Text>
                 </TouchableOpacity>
@@ -290,12 +318,23 @@ const styles = StyleSheet.create({
         color: 'black',
     },
     addButton: {
-        backgroundColor: '#001061',
+        backgroundColor: '#28a745',
         paddingVertical: 5,
         paddingHorizontal: 10,
         borderRadius: 5,
     },
     addButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+    removeButton: {
+        backgroundColor: '#dc3545',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        marginTop: 5,
+    },
+    removeButtonText: {
         color: '#fff',
         fontWeight: 'bold',
     },
@@ -320,11 +359,31 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         backgroundColor: '#fff',
     },
+    selectedItemsContainer: {
+        marginTop: 20,
+    },
+    selectedItemsTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#333',
+    },
+    selectedItem: {
+        backgroundColor: '#e9ecef',
+        padding: 10,
+        borderRadius: 5,
+        marginBottom: 10,
+    },
+    selectedItemText: {
+        fontSize: 16,
+        color: '#333',
+    },
     saveButton: {
-        backgroundColor: '#001061',
+        backgroundColor: '#007bff',
         paddingVertical: 10,
         borderRadius: 5,
         alignItems: 'center',
+        marginTop: 20,
     },
     saveButtonText: {
         color: '#fff',
