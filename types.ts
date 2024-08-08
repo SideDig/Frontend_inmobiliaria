@@ -54,7 +54,17 @@ export interface MaestroAlbanilItem extends MaestroAlbanil {
 export interface DataContextProps {
   propiedades: Propiedad[];
   otrasPropiedades: Propiedad[];
+  categories: Category[];
+  maestrosAlbaniles: MaestroAlbanilItem[];
   fetchPropiedades: (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => void;
   fetchPropiedad: (propiedadId: number) => Promise<Propiedad | null>;
-  maestrosAlbaniles: MaestroAlbanil[];
+  fetchMaestrosParaItem: (itemId: number) => Promise<MaestroAlbanilItem[]>;
+  savePresupuesto: (
+    cliente_id: number,
+    propiedad_id: number,
+    agente_id: number,
+    total: number,
+    selectedItems: Item[],
+    selectedBuilders: { [key: number]: string }
+  ) => Promise<void>;
 }

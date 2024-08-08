@@ -76,17 +76,16 @@ const styles = StyleSheet.create({
     width: 250,
     height: 50,
     backgroundColor: "white",
-    borderRadius: 5,
+    borderRadius: 50,
   },
   buttonTitle: {
     fontWeight: "500",
     fontSize: 17,
     color: "black",
-    borderRadius: 5,
+    borderRadius: 50,
   },
   buttonContainer: {
     height: 80,
     width: 250,
-    borderRadius: 5,
   },
 });

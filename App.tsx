@@ -10,6 +10,7 @@ import FormDatosPersonales from './screens/FormDatosPersonales';
 import PreferenciasUsuario from './screens/PreferenciasUsuario';
 import PerfilUsuario from './screens/PerfilUsuario';
 import CrearPresupuesto from './screens/CrearPresupuesto';
+import Presupuestos from './screens/Presupuestos';
 import Inicio from './screens/Inicio';
 import DetallesPropiedad from './screens/DetallesPropiedad';
 import { AuthProvider } from './context/AuthContext';
@@ -32,6 +33,8 @@ const Tabs = () => {
             iconName = 'filter';
           } else if (route.name === 'PerfilUsuarioTab') {
             iconName = 'person-outline';
+          } else if (route.name === 'Presupuestos') {
+            iconName = 'copy';
           }
           return <Icon name={iconName} size={size} color={color} />;
         },
@@ -42,10 +45,10 @@ const Tabs = () => {
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
-          height: 50,
+          height: 55,
         },
         tabBarLabelStyle: {
-          fontSize: 13,
+          fontSize: 11,
           fontWeight: 'bold',
         },
         headerShown: false,
@@ -53,6 +56,7 @@ const Tabs = () => {
     >
       <Tab.Screen name="HomeTab" component={Inicio} options={{ tabBarLabel: 'Inicio' }} />
       <Tab.Screen name="PreferenciasUsuarioTab" component={PreferenciasUsuario} options={{ tabBarLabel: 'Preferencias' }} />
+      <Tab.Screen name='Presupuestos' component={Presupuestos} options={{tabBarLabel: 'Presupuestos'}} />
       <Tab.Screen name="PerfilUsuarioTab" component={PerfilUsuario} options={{ tabBarLabel: 'Perfil' }} />
     </Tab.Navigator>
   );

@@ -1,16 +1,17 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '../conexionApi/axios';
-import { useAuth } from '../context/AuthContext';
 import { Alert } from 'react-native';
-import { DataContextProps, Propiedad, MaestroAlbanil } from '../types';
+import { useAuth } from '../context/AuthContext';
+import { DataContextProps, Propiedad, MaestroAlbanilItem, Category, Item } from '../types';
 
 const DataContext = createContext<DataContextProps | undefined>(undefined);
 
-export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { token, user } = useAuth();
   const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
   const [otrasPropiedades, setOtrasPropiedades] = useState<Propiedad[]>([]);
-  const [maestrosAlbaniles, setMaestrosAlbaniles] = useState<MaestroAlbanil[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [maestrosAlbaniles, setMaestrosAlbaniles] = useState<MaestroAlbanilItem[]>([]);
 
   const fetchPropiedades = async (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => {
     try {
@@ -65,25 +66,75 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const fetchMaestrosAlbaniles = async () => {
+  const fetchCategories = async () => {
     try {
-      const response = await api.get('/albaniles');
-      setMaestrosAlbaniles(response.data);
+      const response = await api.get('/item/categories');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error al obtener categorías e ítems:', error);
+    }
+  };
+
+  const fetchMaestrosParaItem = async (itemId: number) => {
+    try {
+      const response = await api.get(`/albaniles/item/${itemId}`);
+      return response.data;
     } catch (error) {
       console.error('Error al obtener maestros albañiles:', error);
-      Alert.alert('Error', 'No se pudieron obtener los maestros albañiles. Verifica tu conexión.');
+      return [];
+    }
+  };
+
+  const savePresupuesto = async (
+    cliente_id: number,
+    propiedad_id: number,
+    agente_id: number,
+    total: number,
+    selectedItems: Item[],
+    selectedBuilders: { [key: number]: string }
+  ) => {
+    try {
+      const response = await api.post('/presupuestos', {
+        cliente_id,
+        propiedad_id,
+        agente_id,
+        total,
+        fecha_creacion: new Date().toISOString(),
+      });
+
+      const presupuestoId = response.data.id;
+
+      await Promise.all(selectedItems.map(async (item) => {
+        const builderId = selectedBuilders[item.id];
+        if (builderId) {
+          const maestro = maestrosAlbaniles.find(m => m.id.toString() === builderId);
+          if (maestro) {
+            await api.post('/detalles_presupuesto', {
+              presupuesto_id: presupuestoId,
+              trabajo_maestro_albanil_id: maestro.id,
+              costo_estimado: maestro.costo_estimado,
+              tiempo_estimado: maestro.tiempo_estimado,
+            });
+          }
+        }
+      }));
+
+      Alert.alert('Éxito', 'Presupuesto guardado correctamente.');
+    } catch (error) {
+      console.error('Error al guardar el presupuesto:', error);
+      Alert.alert('Error', 'Hubo un problema al guardar el presupuesto.');
     }
   };
 
   useEffect(() => {
     if (user && token) {
       fetchPropiedades();
-      fetchMaestrosAlbaniles();
+      fetchCategories();
     }
   }, [user, token]);
 
   return (
-    <DataContext.Provider value={{ propiedades, otrasPropiedades, fetchPropiedades, fetchPropiedad, maestrosAlbaniles }}>
+    <DataContext.Provider value={{ propiedades, otrasPropiedades, categories, maestrosAlbaniles, fetchPropiedades, fetchPropiedad, fetchMaestrosParaItem, savePresupuesto }}>
       {children}
     </DataContext.Provider>
   );
