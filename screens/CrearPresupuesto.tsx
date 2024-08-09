@@ -89,18 +89,25 @@ const CrearPresupuesto = () => {
 
   const handleSaveBudget = async () => {
     if (user) {
-      await savePresupuesto(
-        user.id, // ID del cliente correspondiente obtenido del contexto de autenticación
-        propiedad.id,
-        propiedad.agente.id,
-        totalCost,
-        selectedItems,
-        selectedBuilders
-      );
+      try {
+        await savePresupuesto(
+          user.id,
+          propiedad.id,
+          propiedad.agente.id,
+          totalCost,
+          selectedItems,
+          selectedBuilders
+        );
+        Alert.alert('Éxito', 'El presupuesto ha sido guardado y enviado por correo.');
+      } catch (error) {
+        console.error('Error al guardar el presupuesto:', error);
+        Alert.alert('Error', 'Hubo un problema al guardar el presupuesto o enviar el correo.');
+      }
     } else {
       Alert.alert('Error', 'No se pudo obtener el ID del cliente. Inténtalo de nuevo.');
     }
   };
+  
 
   return (
     <SafeAreaView style={styles.safeArea}>

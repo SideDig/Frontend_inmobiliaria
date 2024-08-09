@@ -94,6 +94,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     selectedBuilders: { [key: number]: string }
   ) => {
     try {
+      // 1. Guardar el presupuesto
       const response = await api.post('/presupuestos', {
         cliente_id,
         propiedad_id,
@@ -101,9 +102,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         total,
         fecha_creacion: new Date().toISOString(),
       });
-
+  
       const presupuestoId = response.data.id;
-
+  
+      // 2. Guardar los detalles del presupuesto
       await Promise.all(selectedItems.map(async (item) => {
         const builderId = selectedBuilders[item.id];
         if (builderId) {
@@ -118,13 +120,20 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           }
         }
       }));
-
-      Alert.alert('Éxito', 'Presupuesto guardado correctamente.');
+  
+      // 3. Enviar el correo electrónico al cliente con los detalles del presupuesto
+      await api.post('/correos/enviar', {
+        presupuesto_id: presupuestoId,
+        cliente_id,
+      });
+  
+      Alert.alert('Éxito', 'Presupuesto guardado y correo enviado correctamente.');
     } catch (error) {
-      console.error('Error al guardar el presupuesto:', error);
-      Alert.alert('Error', 'Hubo un problema al guardar el presupuesto.');
+      console.error('Error al guardar el presupuesto o enviar el correo:', error);
+      Alert.alert('Error', 'Hubo un problema al guardar el presupuesto o enviar el correo.');
     }
   };
+  
 
   useEffect(() => {
     if (user && token) {
