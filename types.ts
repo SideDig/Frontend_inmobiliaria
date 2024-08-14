@@ -58,7 +58,14 @@ export interface Presupuesto {
   agente_id: number;
   total: number;
   fecha_creacion: string;
-  propiedad: Propiedad;  
+  nombre_propiedad: string;
+  direccion: string;
+  descripcion: string;
+  precio: number;
+  habitaciones: number;
+  baños: number;
+  tamaño_terreno: number;
+  ubicacion: string;
 }
 
 export interface DataContextProps {
