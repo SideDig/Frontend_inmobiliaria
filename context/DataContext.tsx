@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import api from '../conexionApi/axios';
 import { Alert } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { DataContextProps, Propiedad, MaestroAlbanilItem, Category, Item } from '../types';
+import { DataContextProps, Propiedad, MaestroAlbanilItem, Category, Item, Presupuesto } from '../types';
 
 const DataContext = createContext<DataContextProps | undefined>(undefined);
 
@@ -12,15 +12,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [otrasPropiedades, setOtrasPropiedades] = useState<Propiedad[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [maestrosAlbaniles, setMaestrosAlbaniles] = useState<MaestroAlbanilItem[]>([]);
+  const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([]);
 
   const fetchPropiedades = async (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => {
     try {
+      if (!user) return; // Asegura que user no es null o undefined
       const responseRecomendadas = await api.get('/propiedades/ubicacion', {
-        params: { 
-          ubicacion: user?.ubicacion_casa, 
-          precioDesde: precioDesde || user?.precio_desde, 
-          precioHasta: precioHasta || user?.precio_hasta, 
-          numRecamaras: numRecamaras || user?.num_recamaras 
+        params: {
+          ubicacion: user.ubicacion_casa,
+          precioDesde: precioDesde || user.precio_desde,
+          precioHasta: precioHasta || user.precio_hasta,
+          numRecamaras: numRecamaras || user.num_recamaras,
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -29,7 +31,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setPropiedades(responseRecomendadas.data);
 
       const responseOtras = await api.get('/propiedades/ubicacion', {
-        params: { ubicacion: user?.ubicacion_casa },
+        params: { ubicacion: user.ubicacion_casa },
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -58,7 +60,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           telefono: data.agente_telefono,
           total_ventas: data.agente_total_ventas,
           num_propiedades: data.agente_num_propiedades,
-        }
+        },
       };
     } catch (error) {
       console.error('Error al obtener los detalles de la propiedad:', error);
@@ -85,6 +87,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const fetchPresupuestosUsuario = async () => {
+    try {
+      if (!user) return; // Asegura que user no es null o undefined
+      const response = await api.get(`/presupuestos/usuario/${user.id}`);
+      setPresupuestos(response.data);
+    } catch (error) {
+      console.error('Error fetching presupuestos:', error);
+      
+    }
+  };
+
   const savePresupuesto = async (
     cliente_id: number,
     propiedad_id: number,
@@ -94,18 +107,18 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     selectedBuilders: { [key: number]: string }
   ) => {
     try {
-      // 1. Guardar el presupuesto
       const response = await api.post('/presupuestos', {
         cliente_id,
         propiedad_id,
         agente_id,
         total,
         fecha_creacion: new Date().toISOString(),
+        items: selectedItems,
+        builders: selectedBuilders,
       });
-  
+
       const presupuestoId = response.data.id;
-  
-      // 2. Guardar los detalles del presupuesto
+
       await Promise.all(selectedItems.map(async (item) => {
         const builderId = selectedBuilders[item.id];
         if (builderId) {
@@ -120,30 +133,42 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           }
         }
       }));
-  
-      // 3. Enviar el correo electrónico al cliente con los detalles del presupuesto
+
       await api.post('/correos/enviar', {
         presupuesto_id: presupuestoId,
         cliente_id,
       });
-  
-      Alert.alert('Éxito', 'Presupuesto guardado y correo enviado correctamente.');
+
+      return presupuestoId;
+
     } catch (error) {
       console.error('Error al guardar el presupuesto o enviar el correo:', error);
       Alert.alert('Error', 'Hubo un problema al guardar el presupuesto o enviar el correo.');
+      throw error;
     }
   };
-  
 
   useEffect(() => {
     if (user && token) {
       fetchPropiedades();
       fetchCategories();
+      fetchPresupuestosUsuario();
     }
   }, [user, token]);
 
   return (
-    <DataContext.Provider value={{ propiedades, otrasPropiedades, categories, maestrosAlbaniles, fetchPropiedades, fetchPropiedad, fetchMaestrosParaItem, savePresupuesto }}>
+    <DataContext.Provider value={{
+      propiedades,
+      otrasPropiedades,
+      categories,
+      maestrosAlbaniles,
+      fetchPropiedades,
+      fetchPropiedad,
+      fetchMaestrosParaItem,
+      savePresupuesto,
+      fetchPresupuestosUsuario,
+      presupuestos,
+    }}>
       {children}
     </DataContext.Provider>
   );

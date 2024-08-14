@@ -51,11 +51,22 @@ export interface MaestroAlbanilItem extends MaestroAlbanil {
   tiempo_estimado: number;
 }
 
+export interface Presupuesto {
+  id: number;
+  cliente_id: number;
+  propiedad_id: number;
+  agente_id: number;
+  total: number;
+  fecha_creacion: string;
+  propiedad: Propiedad;  
+}
+
 export interface DataContextProps {
   propiedades: Propiedad[];
   otrasPropiedades: Propiedad[];
   categories: Category[];
   maestrosAlbaniles: MaestroAlbanilItem[];
+  presupuestos: Presupuesto[]; // Añadir la lista de presupuestos
   fetchPropiedades: (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => void;
   fetchPropiedad: (propiedadId: number) => Promise<Propiedad | null>;
   fetchMaestrosParaItem: (itemId: number) => Promise<MaestroAlbanilItem[]>;
@@ -67,4 +78,5 @@ export interface DataContextProps {
     selectedItems: Item[],
     selectedBuilders: { [key: number]: string }
   ) => Promise<void>;
+  fetchPresupuestosUsuario: () => Promise<void>; // Añadir la función para obtener presupuestos
 }
