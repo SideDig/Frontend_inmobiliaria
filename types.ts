@@ -73,7 +73,7 @@ export interface DataContextProps {
   otrasPropiedades: Propiedad[];
   categories: Category[];
   maestrosAlbaniles: MaestroAlbanilItem[];
-  presupuestos: Presupuesto[]; // Añadir la lista de presupuestos
+  presupuestos: Presupuesto[]; 
   fetchPropiedades: (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => void;
   fetchPropiedad: (propiedadId: number) => Promise<Propiedad | null>;
   fetchMaestrosParaItem: (itemId: number) => Promise<MaestroAlbanilItem[]>;
@@ -85,6 +85,6 @@ export interface DataContextProps {
     selectedItems: Item[],
     selectedBuilders: { [key: number]: string }
   ) => Promise<void>;
-  fetchPresupuestosUsuario: () => Promise<void>; // Añadir la función para obtener presupuestos
+  fetchPresupuestosUsuario: () => Promise<void>; 
   deletePresupuesto: (presupuestoId: number) => Promise<void>;
 }

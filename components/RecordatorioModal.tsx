@@ -57,11 +57,12 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
+    textAlign: 'center',
     fontWeight: 'bold',
     marginBottom: 20,
   },
   reminderButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#001061',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,

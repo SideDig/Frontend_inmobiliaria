@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, RefreshControl, Image, SafeAreaView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, RefreshControl, Image, SafeAreaView, StatusBar, TouchableOpacity, Alert, Dimensions, Animated } from 'react-native';
 import { useDataContext } from '../context/DataContext';
 import { Presupuesto } from '../types';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 
+const { width } = Dimensions.get('window');
+
 const Presupuestos = () => {
   const { presupuestos, fetchPresupuestosUsuario, deletePresupuesto } = useDataContext();
   const [refreshing, setRefreshing] = useState(false);
+  const scrollX = new Animated.Value(0);
 
   useEffect(() => {
     fetchPresupuestosUsuario();
@@ -30,9 +33,16 @@ const Presupuestos = () => {
     );
   };
 
-  const renderPresupuesto = ({ item }: { item: Presupuesto }) => {
+  const renderPresupuesto = ({ item, index }: { item: Presupuesto; index: number }) => {
+    const inputRange = [(index - 1) * width * 0.8, index * width * 0.8, (index + 1) * width * 0.8];
+    const scale = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.9, 1, 0.9],
+      extrapolate: 'clamp',
+    });
+
     return (
-      <View style={styles.presupuestoContainer}>
+      <Animated.View style={[styles.presupuestoContainer, { transform: [{ scale }] }]}>
         <Image source={{ uri: 'https://via.placeholder.com/150' }} style={styles.propertyImage} />
         <View style={styles.infoContainer}>
           <Text style={styles.propertyName}>{item.nombre_propiedad}</Text>
@@ -55,10 +65,11 @@ const Presupuestos = () => {
           </View>
           <Text style={styles.fecha}>Creado el: {new Date(item.fecha_creacion).toLocaleDateString()}</Text>
           <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteButton}>
-            <Icon name="trash-outline" size={20} color="#E74C3C" />
+            <Icon name="trash-outline" size={20} color="#FFFFFF" />
+            <Text style={styles.deleteButtonText}>Eliminar</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </Animated.View>
     );
   };
 
@@ -80,10 +91,20 @@ const Presupuestos = () => {
       </LinearGradient>
       <View style={styles.container_listapresupuesto}>
         <Text style={styles.title}>Presupuestos</Text>
-        <FlatList
+        <Animated.FlatList
           data={presupuestos}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderPresupuesto}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          snapToAlignment="center"
+          snapToInterval={width * 0.8 + 20}
+          decelerationRate="fast"
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+            { useNativeDriver: true }
+          )}
+          contentContainerStyle={{ paddingHorizontal: 10 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#007AFF" />
           }
@@ -101,7 +122,7 @@ const Presupuestos = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#ECEFF1",
   },
   container: {
     height: 100,
@@ -114,49 +135,49 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 120,
-    height: 300,
+    height: 120,
     resizeMode: "contain",
-    marginBottom: 0,
   },
   container_listapresupuesto: {
     flex: 1,
-    padding: 10,
-    backgroundColor: '#F4F6F9',
+    paddingVertical: 10,
+    backgroundColor: '#ECEFF1',
   },
   presupuestoContainer: {
-    flexDirection: 'row',
+    width: width * 0.8,
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 12,
-    marginBottom: 20,
+    borderRadius: 20,
+    padding: 20,
+    marginHorizontal: 10,
+    borderLeftWidth: 8,
+    borderLeftColor: '#1ABC9C',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 7,
-    alignItems: 'center',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 8,
   },
   propertyImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 12,
-    marginRight: 16,
+    width: '100%',
+    height: 200,
+    borderRadius: 16,
+    marginBottom: 16,
   },
   infoContainer: {
     flex: 1,
     justifyContent: 'space-between',
   },
   propertyName: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#34495E',
-    marginBottom: 4,
+    color: '#2C3E50',
+    marginBottom: 8,
   },
   total: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#27AE60',
-    marginBottom: 8,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#E67E22',
+    marginBottom: 10,
   },
   detailRow: {
     flexDirection: 'row',
@@ -164,28 +185,38 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   title: {
-    fontSize: 25,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#34495E',
     textAlign: 'center',
-    marginVertical: 15,
-    letterSpacing: 1,
+    marginVertical: 20,
+    letterSpacing: 1.2,
   },
   text: {
-    fontSize: 14,
-    color: '#2C3E50',
-    marginLeft: 8,
+    fontSize: 16,
+    color: '#34495E',
+    marginLeft: 10,
   },
   fecha: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#7F8C8D',
     marginTop: 8,
-    textAlign: 'right',
+    textAlign: 'left',
   },
   deleteButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#E74C3C',
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 15,
+  },
+  deleteButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 10,
   },
   emptyContainer: {
     flex: 1,

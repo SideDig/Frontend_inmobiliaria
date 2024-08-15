@@ -94,7 +94,7 @@ const CrearPresupuesto = () => {
 
   const handleSaveBudget = () => {
     if (user) {
-      // 1. Guardar temporalmente los datos del presupuesto
+      
       setTempBudgetData({
         cliente_id: user.id,
         propiedad_id: propiedad.id,
@@ -103,7 +103,7 @@ const CrearPresupuesto = () => {
         selectedItems,
         selectedBuilders
       });
-      // 2. Mostrar el modal de recordatorio
+     
       setReminderModalVisible(true);
     } else {
       Alert.alert('Error', 'No se pudo obtener el ID del cliente. Inténtalo de nuevo.');
@@ -113,7 +113,6 @@ const CrearPresupuesto = () => {
   const handleSetReminder = async (frequency: string) => {
     try {
       if (tempBudgetData) {
-        // 3. Guardar el presupuesto solo después de seleccionar el recordatorio
         await savePresupuesto(
           tempBudgetData.cliente_id,
           tempBudgetData.propiedad_id,
@@ -125,7 +124,7 @@ const CrearPresupuesto = () => {
 
         Alert.alert('Recordatorio configurado', `Se enviará un recordatorio cada ${frequency}.`);
         setReminderModalVisible(false);
-        navigation.navigate('Presupuestos' as never); // Ajusta 'presupuestos' a la ruta que corresponda
+        navigation.navigate('Presupuestos' as never);
       }
     } catch (error) {
       console.error('Error al guardar el presupuesto o enviar el correo:', error);

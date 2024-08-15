@@ -8,12 +8,13 @@ import Login from './screens/Login';
 import Registro from './screens/Registro';
 import FormDatosPersonales from './screens/FormDatosPersonales';
 import PreferenciasUsuario from './screens/PreferenciasUsuario';
+
 import PerfilUsuario from './screens/PerfilUsuario';
 import CrearPresupuesto from './screens/CrearPresupuesto';
 import Presupuestos from './screens/Presupuestos';
 import Inicio from './screens/Inicio';
 import DetallesPropiedad from './screens/DetallesPropiedad';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { UbicacionProvider } from './context/UbicacionContext';
 import { PreferenciasProvider } from './context/MapaContext';
 import { DataProvider } from './context/DataContext';
@@ -56,9 +57,36 @@ const Tabs = () => {
     >
       <Tab.Screen name="HomeTab" component={Inicio} options={{ tabBarLabel: 'Inicio' }} />
       <Tab.Screen name="PreferenciasUsuarioTab" component={PreferenciasUsuario} options={{ tabBarLabel: 'Preferencias' }} />
-      <Tab.Screen name='Presupuestos' component={Presupuestos} options={{tabBarLabel: 'Presupuestos'}} />
+      <Tab.Screen name='Presupuestos' component={Presupuestos} options={{ tabBarLabel: 'Presupuestos' }} />
       <Tab.Screen name="PerfilUsuarioTab" component={PerfilUsuario} options={{ tabBarLabel: 'Perfil' }} />
     </Tab.Navigator>
+  );
+};
+
+const Lasrutasdetodalaaplicacion = () => {
+  const { user } = useAuth();
+
+  return (
+    <Stack.Navigator>
+      {!user ? (
+        <>
+          <Stack.Screen name="Home" component={PrimerPantalla} options={{ headerShown: false }} />
+          <Stack.Screen name="Registro" component={Registro} options={{ headerShown: false }} />
+          <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="Inicio" component={Tabs} options={{ headerShown: false }} />
+          <Stack.Screen name="FormDatosPersonales" component={FormDatosPersonales} options={{ headerShown: false }} />
+          <Stack.Screen name="PreferenciasUsuario" component={PreferenciasUsuario} options={{ headerShown: false }} />
+          <Stack.Screen name="DetallesPropiedad" component={DetallesPropiedad} options={{ headerShown: false }} />
+          <Stack.Screen name="CrearPresupuesto" component={CrearPresupuesto} options={({ navigation }) => ({
+            headerTitle: "Crear presupuesto", headerLeft: () => (<Icon.Button name="arrow-back" size={25} backgroundColor="#fff" color="#000" onPress={() => navigation.goBack()} />
+            ),
+          })} />
+        </>
+      )}
+    </Stack.Navigator>
   );
 };
 
@@ -69,16 +97,7 @@ const App = () => {
         <PreferenciasProvider>
           <DataProvider>
             <NavigationContainer>
-              <Stack.Navigator>
-                <Stack.Screen name="Home" component={PrimerPantalla} options={{ headerShown: false }} />
-                <Stack.Screen name="Registro" component={Registro} options={{ headerShown: false }} />
-                <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-                <Stack.Screen name="FormDatosPersonales" component={FormDatosPersonales} options={{ headerShown: false }} />
-                <Stack.Screen name="PreferenciasUsuario" component={PreferenciasUsuario} options={{ headerShown: false }} /> 
-                <Stack.Screen name="Inicio" component={Tabs} options={{ headerShown: false }} />
-                <Stack.Screen name="DetallesPropiedad" component={DetallesPropiedad} options={{ headerShown: false }} /> 
-                <Stack.Screen name="CrearPresupuesto" component={CrearPresupuesto} options={({ navigation }) => ({ headerTitle: "Crear presupuesto", headerLeft: () => ( <Icon.Button name="arrow-back" size={25} backgroundColor="#fff" color="#000" onPress={() => navigation.goBack()}/>),})}/>
-              </Stack.Navigator>
+              <Lasrutasdetodalaaplicacion />
             </NavigationContainer>
           </DataProvider>
         </PreferenciasProvider>
