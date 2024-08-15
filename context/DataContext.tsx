@@ -94,7 +94,19 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setPresupuestos(response.data);
     } catch (error) {
       console.error('Error fetching presupuestos:', error);
-      
+    }
+  };
+
+  const deletePresupuesto = async (presupuestoId: number) => {
+    try {
+      await api.delete(`/presupuestos/${presupuestoId}`);
+      setPresupuestos((prevPresupuestos) =>
+        prevPresupuestos.filter((presupuesto) => presupuesto.id !== presupuestoId)
+      );
+      Alert.alert('Éxito', 'Presupuesto eliminado correctamente.');
+    } catch (error) {
+      console.error('Error al eliminar el presupuesto:', error);
+      Alert.alert('Error', 'No se pudo eliminar el presupuesto. Inténtalo de nuevo.');
     }
   };
 
@@ -167,6 +179,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       fetchMaestrosParaItem,
       savePresupuesto,
       fetchPresupuestosUsuario,
+      deletePresupuesto,
       presupuestos,
     }}>
       {children}

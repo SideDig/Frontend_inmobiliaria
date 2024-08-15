@@ -86,4 +86,5 @@ export interface DataContextProps {
     selectedBuilders: { [key: number]: string }
   ) => Promise<void>;
   fetchPresupuestosUsuario: () => Promise<void>; // Añadir la función para obtener presupuestos
+  deletePresupuesto: (presupuestoId: number) => Promise<void>;
 }

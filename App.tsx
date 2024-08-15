@@ -70,7 +70,7 @@ const App = () => {
           <DataProvider>
             <NavigationContainer>
               <Stack.Navigator>
-               <Stack.Screen name="Home" component={PrimerPantalla} options={{ headerShown: false }} />
+                <Stack.Screen name="Home" component={PrimerPantalla} options={{ headerShown: false }} />
                 <Stack.Screen name="Registro" component={Registro} options={{ headerShown: false }} />
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
                 <Stack.Screen name="FormDatosPersonales" component={FormDatosPersonales} options={{ headerShown: false }} />

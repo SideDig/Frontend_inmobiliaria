@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, RefreshControl, Image, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, FlatList, StyleSheet, RefreshControl, Image, SafeAreaView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { useDataContext } from '../context/DataContext';
 import { Presupuesto } from '../types';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const Presupuestos = () => {
-  const { presupuestos, fetchPresupuestosUsuario } = useDataContext();
+  const { presupuestos, fetchPresupuestosUsuario, deletePresupuesto } = useDataContext();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -17,6 +17,17 @@ const Presupuestos = () => {
     setRefreshing(true);
     await fetchPresupuestosUsuario();
     setRefreshing(false);
+  };
+
+  const confirmDelete = (presupuestoId: number) => {
+    Alert.alert(
+      'Eliminar presupuesto',
+      '¿Estás seguro de que deseas eliminar este presupuesto?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Eliminar', style: 'destructive', onPress: () => deletePresupuesto(presupuestoId) },
+      ]
+    );
   };
 
   const renderPresupuesto = ({ item }: { item: Presupuesto }) => {
@@ -43,6 +54,9 @@ const Presupuestos = () => {
             <Text style={styles.text}>{item.tamaño_terreno} m²</Text>
           </View>
           <Text style={styles.fecha}>Creado el: {new Date(item.fecha_creacion).toLocaleDateString()}</Text>
+          <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteButton}>
+            <Icon name="trash-outline" size={20} color="#E74C3C" />
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -65,7 +79,7 @@ const Presupuestos = () => {
         </View>
       </LinearGradient>
       <View style={styles.container_listapresupuesto}>
-      <Text style={styles.title}>Presupuestos</Text>
+        <Text style={styles.title}>Presupuestos</Text>
         <FlatList
           data={presupuestos}
           keyExtractor={(item) => item.id.toString()}
@@ -167,6 +181,11 @@ const styles = StyleSheet.create({
     color: '#7F8C8D',
     marginTop: 8,
     textAlign: 'right',
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
   emptyContainer: {
     flex: 1,
