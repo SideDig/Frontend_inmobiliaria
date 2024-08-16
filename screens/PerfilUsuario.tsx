@@ -9,11 +9,13 @@ const PerfilUsuario: React.FC = () => {
     const { user, cerrarSesion } = useAuth();
     const navigation = useNavigation();
 
-
-
     const handleLogout = async () => {
         await cerrarSesion();
         navigation.navigate('Login' as never);
+    };
+
+    const handleGoToDashboard = () => {
+        navigation.navigate('PantallaAgente' as never);
     };
 
     return (
@@ -35,10 +37,8 @@ const PerfilUsuario: React.FC = () => {
 
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 <View style={styles.profileHeader}>
-
                     <Text style={styles.profileName}>{user?.nombre_completo || 'Usuario'}</Text>
                     <Text style={styles.profileEmail}>{user?.email}</Text>
-
                 </View>
 
                 <View style={styles.profileDetails}>
@@ -64,6 +64,12 @@ const PerfilUsuario: React.FC = () => {
                         <Text style={styles.infoValue}>{user?.direccion || 'No especificado'}</Text>
                     </View>
                 </View>
+
+                {user?.rol === 'agente' && (
+                    <TouchableOpacity style={styles.dashboardButton} onPress={handleGoToDashboard}>
+                        <Text style={styles.dashboardButtonText}>Dashboard</Text>
+                    </TouchableOpacity>
+                )}
 
                 <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                     <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
@@ -102,12 +108,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginVertical: 20,
     },
-    profileImage: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        marginBottom: 15,
-    },
     profileName: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -117,17 +117,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#666',
         marginBottom: 15,
-    },
-    editButton: {
-        backgroundColor: '#001061',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 5,
-    },
-    editButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
     },
     profileDetails: {
         marginTop: 20,
@@ -158,8 +147,21 @@ const styles = StyleSheet.create({
         flex: 2,
         textAlign: 'right',
     },
+    dashboardButton: {
+        backgroundColor: '#4caf50',
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        borderRadius: 5,
+        marginTop: 15,
+        alignItems: 'center',
+    },
+    dashboardButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
     logoutButton: {
-        backgroundColor: '#d9534f',
+        backgroundColor: 'red',
         paddingHorizontal: 20,
         paddingVertical: 15,
         borderRadius: 5,

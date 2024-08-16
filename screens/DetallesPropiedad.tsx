@@ -45,7 +45,7 @@ const DetallesPropiedad = () => {
 
     return (
         <ScrollView style={styles.container}>
-            <Image source={{ uri: propiedad.imagen || 'https://via.placeholder.com/150' }} style={styles.image} />
+            <Image source={{ uri: propiedad.img_propiedad || 'https://via.placeholder.com/150' }} style={styles.image} />
             <View style={styles.infoContainer}>
                 <Text style={styles.title}>{propiedad.nombre_propiedad}</Text>
                 <Text style={styles.address}><FontAwesome name="map-marker" size={14} color="#888" /> {propiedad.direccion}</Text>
@@ -79,7 +79,7 @@ const DetallesPropiedad = () => {
                 <Text style={styles.subTitle}>Descripción</Text>
                 <Text style={styles.description}>{propiedad.descripcion}</Text>
                 <View style={styles.agentContainer}>
-                    <Image source={{ uri: 'https://via.placeholder.com/50' }} style={styles.agentImage} />
+                    <Image source={{ uri:'https://via.placeholder.com/150' }} style={styles.agentImage} />
                     <View style={styles.agentInfo}>
                         <Text style={styles.agentName}>{propiedad.agente.nombre}</Text>
                         <Text style={styles.agentRole}>Agente de la propiedad</Text>
@@ -91,7 +91,7 @@ const DetallesPropiedad = () => {
                     </TouchableOpacity>
                 </View>
                 <Text style={styles.subTitle}>Ubicación</Text>
-                <Image source={{ uri: 'https://via.placeholder.com/300x200' }} style={styles.mapImage} />
+                <Image source={{uri: propiedad.img_propiedad || 'https://via.placeholder.com/150'}} style={styles.mapImage} />
                 <TouchableOpacity 
                     style={styles.button}
                     onPress={() => navigation.navigate('CrearPresupuesto', { propiedad })}

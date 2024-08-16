@@ -19,7 +19,7 @@ export interface Propiedad {
   tamaño_terreno: number;
   caracteristicas: string[];
   ubicacion: string;
-  imagen?: string;
+  img_propiedad?: string;
 }
 
 export interface Item {
@@ -28,6 +28,7 @@ export interface Item {
   descripcion: string;
   costo: string;
   url_imagen: string;
+  img_propiedad: string;
 }
 
 export interface Category {
@@ -66,6 +67,7 @@ export interface Presupuesto {
   baños: number;
   tamaño_terreno: number;
   ubicacion: string;
+  img_propiedad: string;
 }
 
 export interface DataContextProps {
@@ -73,10 +75,11 @@ export interface DataContextProps {
   otrasPropiedades: Propiedad[];
   categories: Category[];
   maestrosAlbaniles: MaestroAlbanilItem[];
-  presupuestos: Presupuesto[]; 
+  presupuestos: Presupuesto[];
   fetchPropiedades: (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => void;
   fetchPropiedad: (propiedadId: number) => Promise<Propiedad | null>;
   fetchMaestrosParaItem: (itemId: number) => Promise<MaestroAlbanilItem[]>;
+  fetchPropiedadesPorAgente: (agenteId: number) => Promise<Propiedad[]>;
   savePresupuesto: (
     cliente_id: number,
     propiedad_id: number,
@@ -85,6 +88,7 @@ export interface DataContextProps {
     selectedItems: Item[],
     selectedBuilders: { [key: number]: string }
   ) => Promise<void>;
-  fetchPresupuestosUsuario: () => Promise<void>; 
+  fetchPresupuestosUsuario: () => Promise<void>;
   deletePresupuesto: (presupuestoId: number) => Promise<void>;
+  deletePropiedad: (propiedadId: number) => Promise<void>;
 }

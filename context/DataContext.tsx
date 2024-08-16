@@ -16,7 +16,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const fetchPropiedades = async (precioDesde?: number, precioHasta?: number, numRecamaras?: number) => {
     try {
-      if (!user) return; // Asegura que user no es null o undefined
+      if (!user) return;
       const responseRecomendadas = await api.get('/propiedades/ubicacion', {
         params: {
           ubicacion: user.ubicacion_casa,
@@ -89,7 +89,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const fetchPresupuestosUsuario = async () => {
     try {
-      if (!user) return; // Asegura que user no es null o undefined
+      if (!user) return;
       const response = await api.get(`/presupuestos/usuario/${user.id}`);
       setPresupuestos(response.data);
     } catch (error) {
@@ -107,6 +107,22 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (error) {
       console.error('Error al eliminar el presupuesto:', error);
       Alert.alert('Error', 'No se pudo eliminar el presupuesto. Inténtalo de nuevo.');
+    }
+  };
+
+  const deletePropiedad = async (propiedadId: number) => {
+    try {
+      await api.delete(`/propiedades/${propiedadId}`);
+      setPropiedades((prevPropiedades) =>
+        prevPropiedades.filter((propiedad) => propiedad.id !== propiedadId)
+      );
+      setOtrasPropiedades((prevPropiedades) =>
+        prevPropiedades.filter((propiedad) => propiedad.id !== propiedadId)
+      );
+      Alert.alert('Éxito', 'Propiedad eliminada correctamente.');
+    } catch (error) {
+      console.error('Error al eliminar la propiedad:', error);
+      Alert.alert('Error', 'No se pudo eliminar la propiedad. Inténtalo de nuevo.');
     }
   };
 
@@ -160,6 +176,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const fetchPropiedadesPorAgente = async (agenteId: number): Promise<Propiedad[]> => {
+    try {
+      const response = await api.get(`/propiedades/agente/${agenteId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener propiedades del agente:', error);
+      Alert.alert('Error', 'No se pudieron obtener las propiedades del agente.');
+      return [];
+    }
+  };
+
   useEffect(() => {
     if (user && token) {
       fetchPropiedades();
@@ -177,9 +204,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       fetchPropiedades,
       fetchPropiedad,
       fetchMaestrosParaItem,
+      fetchPropiedadesPorAgente,
       savePresupuesto,
       fetchPresupuestosUsuario,
       deletePresupuesto,
+      deletePropiedad, 
       presupuestos,
     }}>
       {children}
@@ -189,7 +218,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 export const useDataContext = () => {
   const context = useContext(DataContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useDataContext must be used within a DataProvider');
   }
   return context;

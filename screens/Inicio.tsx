@@ -1,6 +1,5 @@
-// Inicio.tsx
-import React, { useEffect } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, Image, StyleSheet, SafeAreaView, StatusBar, RefreshControl } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Cards from '../components/Cards';
 import Cardsopciones from '../components/CardOpciones';
@@ -10,6 +9,15 @@ import { useAuth } from '../context/AuthContext';
 const Inicio: React.FC = () => {
   const { propiedades, otrasPropiedades, fetchPropiedades } = useDataContext();
   const { user, isNewUser } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (user) {
+      await fetchPropiedades(user.precio_desde, user.precio_hasta, user.num_recamaras);
+    }
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     if (user) {
@@ -31,7 +39,10 @@ const Inicio: React.FC = () => {
         </View>
       </LinearGradient>
 
-      <ScrollView style={styles.scrollViewContainer}>
+      <ScrollView
+        style={styles.scrollViewContainer}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         <View style={styles.header}>
           <Text style={styles.welcomeText}>{isNewUser ? 'Hola, Bienvenido' : 'Bienvenido de vuelta'}</Text>
           <Text>{user ? user.nombre_completo : 'Usuario'}</Text>

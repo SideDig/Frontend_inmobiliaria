@@ -10,7 +10,6 @@ const { width } = Dimensions.get('window');
 const Presupuestos = () => {
   const { presupuestos, fetchPresupuestosUsuario, deletePresupuesto } = useDataContext();
   const [refreshing, setRefreshing] = useState(false);
-  const scrollX = new Animated.Value(0);
 
   useEffect(() => {
     fetchPresupuestosUsuario();
@@ -33,17 +32,9 @@ const Presupuestos = () => {
     );
   };
 
-  const renderPresupuesto = ({ item, index }: { item: Presupuesto; index: number }) => {
-    const inputRange = [(index - 1) * width * 0.8, index * width * 0.8, (index + 1) * width * 0.8];
-    const scale = scrollX.interpolate({
-      inputRange,
-      outputRange: [0.9, 1, 0.9],
-      extrapolate: 'clamp',
-    });
-
+  const renderPresupuesto = ({ item }: { item: Presupuesto }) => {
     return (
-      <Animated.View style={[styles.presupuestoContainer, { transform: [{ scale }] }]}>
-        <Image source={{ uri: 'https://via.placeholder.com/150' }} style={styles.propertyImage} />
+      <View style={styles.presupuestoContainer}>
         <View style={styles.infoContainer}>
           <Text style={styles.propertyName}>{item.nombre_propiedad}</Text>
           <Text style={styles.total}>${item.total.toLocaleString()}</Text>
@@ -69,7 +60,7 @@ const Presupuestos = () => {
             <Text style={styles.deleteButtonText}>Eliminar</Text>
           </TouchableOpacity>
         </View>
-      </Animated.View>
+      </View>
     );
   };
 
@@ -91,20 +82,11 @@ const Presupuestos = () => {
       </LinearGradient>
       <View style={styles.container_listapresupuesto}>
         <Text style={styles.title}>Presupuestos</Text>
-        <Animated.FlatList
+        <FlatList
           data={presupuestos}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderPresupuesto}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          snapToAlignment="center"
-          snapToInterval={width * 0.8 + 20}
-          decelerationRate="fast"
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            { useNativeDriver: true }
-          )}
-          contentContainerStyle={{ paddingHorizontal: 10 }}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#007AFF" />
           }
@@ -144,39 +126,34 @@ const styles = StyleSheet.create({
     backgroundColor: '#ECEFF1',
   },
   presupuestoContainer: {
-    width: width * 0.8,
+    width: width * 0.9,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 20,
-    marginHorizontal: 10,
+    marginVertical: 10,
+    marginHorizontal: 20,
     borderLeftWidth: 8,
-    borderLeftColor: '#1ABC9C',
+    borderLeftColor: '#001061',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 8,
   },
-  propertyImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 16,
-    marginBottom: 16,
-  },
   infoContainer: {
     flex: 1,
     justifyContent: 'space-between',
   },
   propertyName: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#2C3E50',
     marginBottom: 8,
   },
   total: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#E67E22',
+    color: '#001061',
     marginBottom: 10,
   },
   detailRow: {
@@ -187,9 +164,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#34495E',
+    color: 'black',
     textAlign: 'center',
-    marginVertical: 20,
+    marginVertical: 5,
     letterSpacing: 1.2,
   },
   text: {
@@ -207,8 +184,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#E74C3C',
-    padding: 15,
+    backgroundColor: 'red',
+    padding: 10,
     borderRadius: 8,
     marginTop: 15,
   },

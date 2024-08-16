@@ -22,7 +22,7 @@ const CrearPresupuesto = () => {
     tamaño_terreno: 0,
     caracteristicas: [],
     ubicacion: '',
-    imagen: '',
+    img_propiedad: '',
     agente: {
       id: 0,
       nombre: '',
@@ -139,10 +139,10 @@ const CrearPresupuesto = () => {
           <Text style={styles.propertyTitle}>{propiedad.nombre_propiedad}</Text>
           <Text style={styles.propertyDescription}>{propiedad.descripcion}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {propiedad.imagen ? (
-              <Image source={{ uri: propiedad.imagen }} style={styles.propertyImage} />
+            {propiedad.img_propiedad ? (
+              <Image source={{ uri: propiedad.img_propiedad }} style={styles.propertyImage} />
             ) : (
-              <Image source={{ uri: 'https://via.placeholder.com/100' }} style={styles.propertyImage} />
+              <Image source={{uri: propiedad.img_propiedad || 'https://via.placeholder.com/150'}} style={styles.propertyImage} />
             )}
           </ScrollView>
         </View>

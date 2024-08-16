@@ -25,7 +25,7 @@ export interface Propiedad {
   tamaño_terreno: number;
   caracteristicas: string[];
   ubicacion: string;
-  imagen?: string;
+  img_propiedad?: string;
 }
 
 interface CardsProps {
@@ -41,7 +41,7 @@ const Cards: React.FC<CardsProps> = ({ propiedad }) => {
 
   return (
     <TouchableOpacity style={styles.propertyCard} onPress={handlePress}>
-      <Image source={{ uri: propiedad.imagen || 'https://via.placeholder.com/150' }} style={styles.propertyImage} />
+      <Image source={{ uri: propiedad.img_propiedad || 'https://via.placeholder.com/150' }} style={styles.propertyImage} />
       <Text style={styles.propertyTitle}>{propiedad.nombre_propiedad}</Text>
       <Text style={styles.propertyPrice}>{`$${propiedad.precio}`}</Text>
       <View style={styles.ubicaciones}>
